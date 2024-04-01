@@ -765,3 +765,4 @@ If you find threestudio helpful, please consider citing:
   year =         {2023}
 }
 ```
+# ScaleDreamer
