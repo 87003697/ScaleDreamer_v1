@@ -51,12 +51,12 @@ system:
     color_activation: sigmoid
     requires_normal: true
 
-  background_type: "neural-hashgrid-environment-map-background"
+  background_type: "neural-environment-map-background"
   background:
     color_activation: sigmoid
     random_aug: true
     random_aug_prob: 0.5
-    pos_encoding_config:
+    dir_encoding_config:
       otype: HashGrid
       n_features_per_level: 2
       log2_hashmap_size: 19
