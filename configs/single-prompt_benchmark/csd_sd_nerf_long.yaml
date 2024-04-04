@@ -21,7 +21,7 @@ data:
   eval_fovy_deg: 70.
   n_val_views: 30
 
-system_type: "stabledreamer-system"
+system_type: "scaledreamer-system"
 system:
   visualize_samples: false #true
   validation_via_video: true
@@ -86,7 +86,7 @@ system:
     front_threshold: 30. # same as vsd
     back_threshold: 30.
 
-  guidance_type: "stable-diffusion-classifier-guidance"
+  guidance_type: "stable-diffusion-classifier-score-distillation-guidance"
   guidance:
     pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     weighting_strategy: uniform # as in csd official implementation

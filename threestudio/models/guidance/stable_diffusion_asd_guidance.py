@@ -362,8 +362,8 @@ class SDTimestepShiftedScoreDistillationGuidance(BaseObject):
                 neg_guidance_weights,
             ) = prompt_utils.get_text_embeddings_perp_neg(
                 elevation, azimuth, camera_distances, self.cfg.view_dependent_prompting,
-                guidance_scale_neg=guidenace_scale_perp_neg
             )
+            neg_guidance_weights = neg_guidance_weights * -1 * guidenace_scale_perp_neg # multiply by a negative value to control its magnitude
             text_embeddings_vd     = text_embeddings[0 * batch_size: 1 * batch_size]
             text_embeddings_uncond = text_embeddings[1 * batch_size: 2 * batch_size]
             text_embeddings_vd_neg = text_embeddings[2 * batch_size: 4 * batch_size]

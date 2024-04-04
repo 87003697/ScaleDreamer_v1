@@ -21,7 +21,7 @@ data:
   eval_fovy_deg: 70.
   n_val_views: 30
 
-system_type: "stabledreamer-system"
+system_type: "scaledreamer-system"
 system:
   visualize_samples: false #true
   validation_via_video: true
@@ -85,15 +85,8 @@ system:
     use_perp_neg: true
     front_threshold: 30. # same as vsd
     back_threshold: 30.
-    # # a*e(-b*r) + c
-    # # a * e(-b) + c = 0
-    # # kind of tricky to set the parameters to alleviate the Janus effect
-    perp_neg_f_sb: [1, 1., -0.497] # [1, 0.7, -0.368] [1, 0.5, -0.606]
-    perp_neg_f_fsb: [1, 0.5, 1.201] # [1, 0.7, +0.201] [1, 0.7, +0.601] # 
-    perp_neg_f_fs:  [4, 1., -1.972] # [4, 0.7, -1.472] [4, 0.5, -1.472]
-    perp_neg_f_sf: [4, 0.5, -2.972] # [4, 0.7, -1.472] [4, 0.5, -1.472]
 
-  guidance_type: "stable-diffusion-asynchronous-score-distillation-guidance-final"
+  guidance_type: "stable-diffusion-asynchronous-score-distillation-guidance"
   guidance:
     pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     guidance_scale: 7.5

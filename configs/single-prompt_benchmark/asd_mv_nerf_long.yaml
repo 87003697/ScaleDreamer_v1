@@ -21,7 +21,7 @@ data:
   eval_fovy_deg: 40.
   n_val_views: 30
 
-system_type: "stabledreamer-system"
+system_type: "scaledreamer-system"
 system:
   visualize_samples: false #true
   validation_via_video: true
@@ -79,7 +79,7 @@ system:
     front_threshold: 30.
     back_threshold: 30.
 
-  guidance_type: "mvdream-ssynchronous-score-distillation-guidance"
+  guidance_type: "mvdream-asynchronous-score-distillation-guidance"
   guidance:
     model_name: "sd-v2.1-base-4view"
     ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)

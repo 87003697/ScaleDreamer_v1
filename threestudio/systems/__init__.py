@@ -3,4 +3,5 @@ from . import (
     fantasia3d,
     prolificdreamer,
     mvdream,
+    scaledreamer
 )

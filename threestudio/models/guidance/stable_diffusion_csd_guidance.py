@@ -139,7 +139,7 @@ class StableDiffusionClassifierGuidance(BaseObject):
             from threestudio.models.prompt_processors.base import hash_prompt
             def load_from_cache(prompt):
                 cache_path = os.path.join(
-                    ".threestudio_cache/text_embeddings"
+                    ".threestudio_cache/text_embeddings/"
                     f"{hash_prompt(self.cfg.pretrained_model_name_or_path, prompt)}.pt",
                 )
                 # if not os.path.exists(cache_path):
