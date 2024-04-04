@@ -290,7 +290,7 @@ class MVDreamTimestepShiftedScoreDistillationGuidance(BaseObject):
         loss_tssd = 0.5 * F.mse_loss(latents, target, reduction="sum") / batch_size
 
         return {
-            "loss_tssd": loss_tssd,
+            "loss_asd": loss_tssd,
             "grad_norm": grad.norm(),
             "min_step": self.min_step,
             "max_step": self.max_step,

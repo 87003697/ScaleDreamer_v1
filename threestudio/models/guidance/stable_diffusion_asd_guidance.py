@@ -283,7 +283,7 @@ class SDTimestepShiftedScoreDistillationGuidance(BaseObject):
         loss_sds = 0.5 * F.mse_loss(latents, target, reduction="sum") / batch_size
 
         guidance_out = {
-            "loss_tssd": loss_sds,
+            "loss_asd": loss_sds,
             "grad_norm": grad.norm(),
             "min_step": self.min_step,
             "max_step": self.max_step,

@@ -372,7 +372,7 @@ class StableDiffusionClassifierGuidance(BaseObject):
         loss_sds = 0.5 * F.mse_loss(latents, target, reduction="sum") / batch_size
 
         guidance_out = {
-            "loss_sds": loss_sds,
+            "loss_csd": loss_sds,
             "grad_norm": grad.norm(),
             "min_step": self.min_step,
             "max_step": self.max_step,

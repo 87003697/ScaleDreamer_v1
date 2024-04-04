@@ -1,4 +1,4 @@
-name: "mse_mvdream_nerf_long"
+name: "mse_mvdream_nerf"
 tag: "${rmspace:${system.prompt_processor.prompt},_}"
 exp_root_dir: "outputs"
 seed: 0
@@ -10,16 +10,16 @@ data:
   # 0-4999: 64x64, >=5000: 256x256
   width: [64, 256]
   height: [64, 256]
-  resolution_milestones: [20000]
+  resolution_milestones: [10000]
   camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
   elevation_range: [0, 30]
   camera_perturb: 0.
   center_perturb: 0.
   up_perturb: 0.
-  n_val_views: 4
   eval_camera_distance: 3.0
   eval_fovy_deg: 40.
+  n_val_views: 1
 
 system_type: "mvdream-system"
 system:
@@ -65,7 +65,7 @@ system:
   renderer_type: "nerf-volume-renderer"
   renderer:
     radius: ${system.geometry.radius}
-    num_samples_per_ray: 128
+    num_samples_per_ray: 256 # for lower vram
 
   prompt_processor_type: "stable-diffusion-prompt-processor"
   prompt_processor:

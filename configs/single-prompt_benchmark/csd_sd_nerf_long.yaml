@@ -105,9 +105,9 @@ system:
       name: None
 
   loss:
-    lambda_sds: 1.
+    lambda_csd: 1.
     lambda_orient: 0.
-    lambda_sparsity: 0.
+    lambda_sparsity: 30
     lambda_opaque: [10000, 0.0, 100.0, 10001]
     lambda_z_variance: 0.
   optimizer:
@@ -126,6 +126,7 @@ system:
         lr: 0.01
       background.network:
         lr: 0.001
+
 trainer:
   max_steps: 25000
   log_every_n_steps: 1

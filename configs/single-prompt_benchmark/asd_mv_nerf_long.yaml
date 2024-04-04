@@ -5,7 +5,7 @@ seed: 10
 
 data_type: "mvdream-random-multiview-camera-datamodule"
 data:
-  batch_size: [8, 4] # must be dividable by n_view
+  batch_size: [4, 4] # must be dividable by n_view
   n_view: 4
   # 0-4999: 64x64, >=5000: 256x256
   width: [64, 256]
@@ -96,7 +96,7 @@ system:
       name: None
 
   loss:
-    lambda_tssd: 1.
+    lambda_asd: 1.
     lambda_orient: [10000, 0., 100., 10001]
     lambda_sparsity: 20
     lambda_opaque: [10000, 0.0, 100.0, 10001]

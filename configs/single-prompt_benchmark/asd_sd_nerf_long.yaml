@@ -93,7 +93,7 @@ system:
     perp_neg_f_fs:  [4, 1., -1.972] # [4, 0.7, -1.472] [4, 0.5, -1.472]
     perp_neg_f_sf: [4, 0.5, -2.972] # [4, 0.7, -1.472] [4, 0.5, -1.472]
 
-  guidance_type: "stable-diffusion-asynchronous-score-distillation-guidance"
+  guidance_type: "stable-diffusion-asynchronous-score-distillation-guidance-final"
   guidance:
     pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     guidance_scale: 7.5
@@ -109,9 +109,9 @@ system:
       name: None
 
   loss:
-    lambda_tssd: 1.
+    lambda_asd: 1.
     lambda_orient: 0.
-    lambda_sparsity: 50
+    lambda_sparsity: 30
     lambda_opaque: [10000, 0.0, 100.0, 10001]
     lambda_z_variance: 0.
   optimizer:
@@ -130,6 +130,7 @@ system:
         lr: 0.01
       background.network:
         lr: 0.001
+
 trainer:
   max_steps: 25000
   log_every_n_steps: 1
