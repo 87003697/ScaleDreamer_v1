@@ -1,3 +1,6 @@
+# ScaleDreamer: Scalable Text-to-3D Synthesis with Asynchronous Score Distillation
+## Paper | [Project Page](https://sites.google.com/view/scaledreamer)
+
 ## Installation
 
 See [installation.md](docs/installation.md) for additional information, including installation via Docker.
