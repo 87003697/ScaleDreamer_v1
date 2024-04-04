@@ -1,1 +1,1 @@
-please the 2D diffusion prior here.
+place the 2D diffusion prior here.
