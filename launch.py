@@ -53,9 +53,14 @@ def load_custom_module(module_path):
                 module_name, module_path
             )
         else:
-            module_spec = importlib.util.spec_from_file_location(
-                module_name, os.path.join(module_path, "__init__.py")
-            )
+            # manually avoid reading the .git directory
+            if module_path.endswith(".git"):
+                return False
+            ##############################
+            else:
+                module_spec = importlib.util.spec_from_file_location(
+                    module_name, os.path.join(module_path, "__init__.py")
+                )
 
         module = importlib.util.module_from_spec(module_spec)
         sys.modules[module_name] = module
@@ -186,9 +191,9 @@ def main(args, extras) -> None:
                 dirpath=os.path.join(cfg.trial_dir, "ckpts"), **cfg.checkpoint
             ),
             LearningRateMonitor(logging_interval="step"),
-            CodeSnapshotCallback(
-                os.path.join(cfg.trial_dir, "code"), use_version=False
-            ),
+            # CodeSnapshotCallback(
+            #     os.path.join(cfg.trial_dir, "code"), use_version=False
+            # ),
             ConfigSnapshotCallback(
                 args.config,
                 cfg,

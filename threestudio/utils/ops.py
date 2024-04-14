@@ -103,6 +103,9 @@ def get_activation(name) -> Callable:
         return lambda x: F.softplus(x - 1.0)
     elif name == "scale_-11_01":
         return lambda x: x * 0.5 + 0.5
+    # manually added activation functions
+    elif name == "sigmoid-mipnerf":
+        return lambda x: torch.sigmoid(x) * (1 + 2*0.001) - 0.001  # Uses sigmoid clamping from MipNeRF
     else:
         try:
             return getattr(F, name)
