@@ -128,7 +128,7 @@ trainer:
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
-  accumulate_grad_batches: 2
+  accumulate_grad_batches: 1
 
 checkpoint:
   save_last: true

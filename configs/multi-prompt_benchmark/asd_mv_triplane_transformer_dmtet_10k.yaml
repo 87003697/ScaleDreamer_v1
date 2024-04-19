@@ -1,4 +1,4 @@
-name: "mse_mv_triplane_transformer_dmtet_10k"
+name: "asd_mv_triplane_transformer_dmtet_10k"
 tag: "${rmspace:${system.prompt_processor.prompt_library},_}"
 exp_root_dir: "outputs"
 seed: 0
@@ -9,8 +9,8 @@ data:
   n_view: 4
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
-  width: 512
-  height: 512
+  width: 256
+  height: 256
   camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
   elevation_range: [0, 30]
@@ -33,12 +33,12 @@ system:
 
   geometry_type: "Triplane-transformer-sdf"
   geometry:
-    radius: 2.0
+    radius: 0.5
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
     sdf_bias: sphere
-    sdf_bias_params: 0.8 # easier to converge than 0.5
+    sdf_bias_params: 0.5 # easier to converge than 0.5
 
     isosurface_deformable_grid: true
     space_generator_config: # adopt from OpenLRM
@@ -75,15 +75,15 @@ system:
     prompt_library: ???
     negative_prompt: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
 
-  guidance_type: "mvdream-multiview-diffusion-guidance"
+  guidance_type: "mvdream-asynchronous-score-distillation-guidance"
   guidance:
     model_name: "sd-v2.1-base-4view"
     ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
-    guidance_scale: 50.0
+    guidance_scale: 7.5
+    plus_ratio: 0.1
+    plus_random: true
     min_step_percent: [0, 0.5, 0.02, 50000] # follow MVDream
     max_step_percent: [0, 0.98, 0.5, 50000] # same as vsd
-    recon_loss: true
-    recon_std_rescale: 0.5
 
   loggers:
     wandb:
