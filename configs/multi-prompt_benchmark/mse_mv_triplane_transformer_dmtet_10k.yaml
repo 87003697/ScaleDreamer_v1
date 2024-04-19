@@ -9,8 +9,8 @@ data:
   n_view: 4
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
-  width: 512
-  height: 512
+  width: 256
+  height: 256
   camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
   elevation_range: [0, 30]
@@ -33,7 +33,7 @@ system:
 
   geometry_type: "Triplane-transformer-sdf"
   geometry:
-    radius: 0.5
+    radius: 1.0
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
