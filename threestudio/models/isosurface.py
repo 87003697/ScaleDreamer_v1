@@ -166,20 +166,31 @@ class MarchingTetrahedraHelper(IsosurfaceHelper):
         return torch.stack([a, b], -1)
 
     def _forward(self, pos_nx3, sdf_n, tet_fx4):
+        # pos_nx3.shape = torch.Size([277410, 3])
+        # sdf_n.shape = torch.Size([277410, 1])
+        # tet_fx4 = torch.Size([1524684, 4])
         with torch.no_grad():
             occ_n = sdf_n > 0
             occ_fx4 = occ_n[tet_fx4.reshape(-1)].reshape(-1, 4)
+            # occ_fx4.shape = torch.Size([1524684, 4])
             occ_sum = torch.sum(occ_fx4, -1)
+            # occ_sum.shape = torch.Size([1524684])
             valid_tets = (occ_sum > 0) & (occ_sum < 4)
+            # valid_tets.shape = torch.Size([1524684])
             occ_sum = occ_sum[valid_tets]
+            # occ_sum.shape = torch.Size([1524684])
 
             # find all vertices
             all_edges = tet_fx4[valid_tets][:, self.base_tet_edges].reshape(-1, 2)
+            # all_edges.shape = torch.Size([1292622, 2])
             all_edges = self.sort_edges(all_edges)
             unique_edges, idx_map = torch.unique(all_edges, dim=0, return_inverse=True)
+            # unique_edges.shape = torch.Size([347568, 1, 2])
+            # idx_map.shape = torch.Size([1292622])
 
             unique_edges = unique_edges.long()
             mask_edges = occ_n[unique_edges.reshape(-1)].reshape(-1, 2).sum(-1) == 1
+            # mask_edges.shape = torch.Size([347568])
             mapping = (
                 torch.ones(
                     (unique_edges.shape[0]), dtype=torch.long, device=pos_nx3.device
