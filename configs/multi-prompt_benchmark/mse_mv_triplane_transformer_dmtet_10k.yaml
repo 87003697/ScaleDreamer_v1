@@ -92,7 +92,7 @@ system:
       name: None
 
   loss:
-    lambda_asd: 1.
+    lambda_sds: 1.
     lambda_orient: 0.
     lambda_sparsity: 20.
     lambda_opaque: [80000, 0, 1., 100000] # final 1/5 iterations
