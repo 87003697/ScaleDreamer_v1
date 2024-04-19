@@ -33,12 +33,12 @@ system:
 
   geometry_type: "Triplane-transformer-sdf"
   geometry:
-    radius: 2.0
+    radius: 0.5
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
     sdf_bias: sphere
-    sdf_bias_params: 0.8 # easier to converge than 0.5
+    sdf_bias_params: 0.5 # easier to converge than 0.5
 
     isosurface_deformable_grid: true
     space_generator_config: # adopt from OpenLRM
