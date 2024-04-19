@@ -33,7 +33,7 @@ system:
 
   geometry_type: "Triplane-transformer-sdf"
   geometry:
-    radius: 1.0
+    radius: 0.5
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
