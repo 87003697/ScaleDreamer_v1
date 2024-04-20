@@ -97,7 +97,7 @@ system:
     lambda_sparsity: 1.
     lambda_opaque: [80000, 0, 1., 100000] # final 1/5 iterations
     lambda_z_variance: 0.
-    lambda_eikonal: 0.01 #[1, 10., 1., 10000] # fisrt 1/10 iterations
+    lambda_eikonal: 0.001 #[1, 10., 1., 10000] # fisrt 1/10 iterations
 
   optimizer:
     name: Adan # for fast convergence
@@ -106,9 +106,9 @@ system:
       eps: 1.e-15
     params:
       geometry:
-        lr: 0.0002
+        lr: 0.001
       background:
-        lr: 0.0002
+        lr: 0.001
 
 
 trainer:

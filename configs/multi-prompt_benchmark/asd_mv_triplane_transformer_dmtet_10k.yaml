@@ -9,8 +9,8 @@ data:
   n_view: 4
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
-  width: 256
-  height: 256
+  width: 512
+  height: 512
   camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
   elevation_range: [0, 30]
@@ -20,6 +20,7 @@ data:
   eval_camera_distance: 3.0
   eval_fovy_deg: 40.
   n_val_views: 40
+  # light_sample_strategy: "dreamfusion"
   # generation related
   prompt_library: ${system.prompt_processor.prompt_library}
   dim_gaussian: 1 # not used
@@ -53,16 +54,22 @@ system:
       flash_attention: false
       local_text: true
 
-  material_type: no-material
+  # material_type: no-material
+  # material:
+  #   n_output_dims: 3
+  #   color_activation: sigmoid-mipnerf # follow OpenLRM
+  #   requires_normal: true
+
+  material_type: "diffuse-with-point-light-material"
   material:
-    n_output_dims: 3
-    color_activation: sigmoid-mipnerf # follow OpenLRM
-    requires_normal: true
+    # ambient_only_steps: 100000
+    # textureless_prob: 0.05
+    albedo_activation: sigmoid-mipnerf # follow OpenLRM
 
   background_type: "neural-environment-map-background"
   background:
     color_activation: sigmoid-mipnerf # follow OpenLRM
-    random_aug: false
+    random_aug: false #true
 
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
@@ -94,10 +101,10 @@ system:
   loss:
     lambda_asd: 1.
     lambda_orient: 0.
-    lambda_sparsity: 1.
+    lambda_sparsity: 20.
     lambda_opaque: [80000, 0, 1., 100000] # final 1/5 iterations
     lambda_z_variance: 0.
-    lambda_eikonal: 0.01 #[1, 10., 1., 10000] # fisrt 1/10 iterations
+    lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
 
   optimizer:
     name: Adan # for fast convergence
@@ -106,9 +113,9 @@ system:
       eps: 1.e-15
     params:
       geometry:
-        lr: 0.0002
+        lr: 0.001
       background:
-        lr: 0.0002
+        lr: 0.001
 
 
 trainer:
