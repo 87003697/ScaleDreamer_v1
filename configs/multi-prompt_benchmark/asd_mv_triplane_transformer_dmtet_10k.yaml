@@ -5,7 +5,7 @@ seed: 0
 
 data_type: "multiprompt-multiview-camera-datamodule"
 data:
-  batch_size: 4 # temporarily changed
+  batch_size: 16 # temporarily changed
   n_view: 4
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
@@ -34,7 +34,7 @@ system:
 
   geometry_type: "Triplane-transformer-sdf"
   geometry:
-    radius: 0.8
+    radius: 0.5
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
@@ -101,7 +101,7 @@ system:
   loss:
     lambda_asd: 1.
     lambda_orient: 0.
-    lambda_sparsity: 20.
+    lambda_sparsity: 50.
     lambda_opaque: [80000, 0, 1., 100000] # final 1/5 iterations
     lambda_z_variance: 0.
     lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
