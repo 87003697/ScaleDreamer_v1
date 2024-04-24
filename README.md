@@ -29,7 +29,11 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url http
 # or torch2.0.0+cu118
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
-
+- (Optional) Install the c++ verion
+```sh
+conda install -c conda-forge gxx=9.5.0
+ln -s $CONDA_PREFIX/lib/stubs/libcuda.so $CONDA_PREFIX/lib
+```
 - (Optional, Recommended) Install ninja to speed up the compilation of CUDA extensions:
 
 ```sh
