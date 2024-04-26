@@ -112,8 +112,9 @@ system:
     lambda_opaque: [80000, 0, 1., 100000] # final 1/5 iterations
     lambda_z_variance: 0.
     lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
-    lambda_normal_consistency: 1000.
-    lambda_laplacian_smoothness: 0.
+    lambda_normal_consistency: 100.
+    lambda_laplacian_smoothness: 10.
+    lambda_normal_smoothness_2d: 1000.
 
     lambda_asd_2nd: ${system.loss.lambda_asd}
     lambda_orient_2nd: 0.
@@ -123,6 +124,7 @@ system:
     lambda_eikonal_2nd: 0.01
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
+    lambda_normal_smoothness_2d_2nd: ${system.loss.lambda_normal_smoothness_2d}
 
   optimizer:
     name: Adan # for fast convergence
