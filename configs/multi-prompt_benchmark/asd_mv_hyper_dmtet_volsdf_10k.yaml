@@ -62,7 +62,7 @@ system:
   background_type: "neural-environment-map-background"
   background:
     color_activation: sigmoid
-    random_aug: false
+    random_aug: true
 
 
   renderer_type: generative-space-dmtet-rasterize-renderer
@@ -93,6 +93,7 @@ system:
   guidance:
     model_name: "sd-v2.1-base-4view"
     ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
+    weighting_strategy: "uniform"
     guidance_scale: 7.5
     plus_ratio: 0.1
     plus_random: true
@@ -113,7 +114,7 @@ system:
     lambda_z_variance: 0.
     lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
     lambda_normal_consistency: 100.
-    lambda_laplacian_smoothness: 10.
+    lambda_laplacian_smoothness: 0. #10.
     lambda_normal_smoothness_2d: 1000.
 
     lambda_asd_2nd: ${system.loss.lambda_asd}
