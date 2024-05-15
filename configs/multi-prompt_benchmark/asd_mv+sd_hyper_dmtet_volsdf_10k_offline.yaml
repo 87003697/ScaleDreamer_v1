@@ -104,7 +104,7 @@ system:
     min_step_percent: [0, 0.5, 0.02, 50000] # follow MVDream
     max_step_percent: [0, 0.98, 0.5, 50000] # same as vsd
     sd_weight: 1.
-    mv_weight: 0.25
+    mv_weight: 1 #0.25
 
   loggers:
     wandb:
