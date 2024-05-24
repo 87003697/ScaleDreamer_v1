@@ -1,4 +1,4 @@
-name: "asd_mv+sd_hyper_dmtet_volsdf_10k_offline"
+name: "asd_mv+sd_sd3d_v1_dmtet_volsdf_10k_offline"
 tag: "${rmspace:${system.prompt_processor.prompt_library},_}"
 exp_root_dir: "outputs"
 seed: 0
@@ -33,16 +33,16 @@ system:
 
   geometry_type: "one-step-triplane-stable-diffusion"
   geometry:
-    radius: 1.0 # nan for 1.0
+    radius: 1.2 #1.5 shrink a bit
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
     sdf_bias: sphere
-    sdf_bias_params: 0.5
+    sdf_bias_params: 0.1 # a small bias will be fine?
 
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-      training_type: "lora_rank_4"
+      training_type: "lora_rank_32_locon_rank_32"
       timestep: 999
       num_planes: 3
       output_dim: 32
@@ -64,6 +64,7 @@ system:
   renderer:
     radius: ${system.geometry.radius}
     isosurface_remove_outliers: false
+    isosurface_method: "mc-cpu"
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
@@ -93,7 +94,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    weighting_strategy: "sds"
+    weighting_strategy: "uniform"
     guidance_scale: 7.5
     plus_ratio: 0.1
     plus_random: true
@@ -136,11 +137,10 @@ system:
       eps: 1.e-15
     params:
       geometry:
-        lr: 0.002
+        lr: 0.001
       background:
-        lr: 0.002
-      # renderer_2nd:
-      #   lr: 0.0005
+        lr: 0.001
+
 
 
 trainer:
