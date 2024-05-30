@@ -38,21 +38,22 @@ system:
     finite_difference_normal_eps: 0.01
 
     sdf_bias: sphere
-    sdf_bias_params: 0.5 # a small bias will be fine?
+    sdf_bias_params: 0.2 # a small bias will be fine?
 
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
-      training_type: "lora_rank_4_locon_rank_4" # _with_bias
+      training_type: "lora_rank_8_locon_rank_8_with_bias" # _with_bias
       timestep: 999
       num_planes: 3
       output_dim: 32
-      gradient_checkpoint: true
+      # gradient_checkpoint: true
               
 
   material_type: no-material
   material:
     n_output_dims: 3
     requires_normal: true
+    color_activation: sigmoid-mipnerf # follow OpenLRM
 
   background_type: "solid-color-background"
   background:
@@ -94,12 +95,12 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    weighting_strategy: "uniform"
+    # weighting_strategy: "uniform"
     guidance_scale: 7.5
     plus_ratio: 0.1
     plus_random: true
-    min_step_percent: [0, 0.5, 0.02, 50000] # follow MVDream
-    max_step_percent: [0, 0.98, 0.5, 50000] # same as vsd
+    min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDream
+    max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
     sd_weight: 1.
     mv_weight: 1.
 
