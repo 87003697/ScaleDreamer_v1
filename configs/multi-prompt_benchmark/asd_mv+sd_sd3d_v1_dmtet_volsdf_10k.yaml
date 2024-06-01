@@ -13,16 +13,17 @@ data:
   height: 256
   ray_height: 64
   ray_width: 64
-  camera_distance_range: [1.5, 2.0] #[0.8, 1.0] # relative
+  camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
   elevation_range: [0, 30]
-  eval_camera_distance: 1.5
+  eval_camera_distance: 3.0
   eval_fovy_deg: 40.
   n_val_views: 30
   # light_sample_strategy: "dreamfusion"
   # generation related
   prompt_library: ${system.prompt_processor.prompt_library}
   dim_gaussian: [3, 4, 32, 32] # not used
+  pure_zeros: true
 
 system_type: "multiprompt-dual-renderer-generator-system"
 system:
@@ -95,7 +96,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    # weighting_strategy: "uniform"
+    weighting_strategy: "uniform"
     guidance_scale: 7.5
     plus_ratio: 0.1
     plus_random: true
@@ -111,7 +112,7 @@ system:
       name: None
 
   loss:
-    lambda_asd: 1.
+    lambda_asd: 1
     lambda_orient: 0.
     lambda_sparsity: 0
     lambda_opaque: 0 # final 1/5 iterations
@@ -138,9 +139,9 @@ system:
       eps: 1.e-15
     params:
       geometry:
-        lr: 0.0005
+        lr: 0.0002
       background:
-        lr: 0.0005
+        lr: 0.0002
 
 
 
