@@ -127,7 +127,7 @@ system:
     lambda_sparsity_2nd: 30.
     lambda_opaque_2nd: 0. #1.
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 0.001
+    lambda_eikonal_2nd: 0.005
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. #100 #${system.loss.lambda_normal_smoothness_2d}
