@@ -15,7 +15,7 @@ data:
   ray_width: 64
   camera_distance_range: [0.8, 1.0] # relative
   fovy_range: [15, 60]
-  elevation_range: [0, 30]
+  elevation_range: [0, 30] #[0, 30]
   eval_camera_distance: 3.0
   eval_fovy_deg: 40.
   n_val_views: 30
@@ -48,7 +48,6 @@ system:
       num_planes: 3
       output_dim: 32
       # gradient_checkpoint: true
-              
 
   material_type: no-material
   material:
@@ -56,11 +55,20 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
-  background_type: "solid-color-background"
+  background_type: "neural-environment-map-background"
   background:
-    color: [0.5, 0.5, 0.5]
+    color_activation: sigmoid
     random_aug: false
-
+    random_aug_prob: 0.5
+    dir_encoding_config:
+      otype: HashGrid
+      n_features_per_level: 2
+      log2_hashmap_size: 19
+      n_levels: 4
+      base_resolution: 4
+      # desired_resolution = 256
+      per_level_scale: 4.0
+      # per_level_scale = np.exp2(np.log2(desired_resolution / base_resolution) / (num_levels - 1))
 
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
@@ -90,6 +98,9 @@ system:
     negative_prompt_2nd: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
     gpu_split: false
     use_local_text_embeddings: true
+    # use_perp_neg: true
+    # front_threshold: 30. # same as vsd
+    # back_threshold: 30.
 
   guidance_type: "stable-diffusion-mvdream-asynchronous-score-distillation-guidance"
   guidance:
@@ -103,6 +114,8 @@ system:
     min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDream
     max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
     sd_weight: 1.
+    # sd_guidance_perp_neg: -0.5
+    sd_view_dependent_prompting: false
     mv_weight: 1.
 
   loggers:
@@ -127,7 +140,7 @@ system:
     lambda_sparsity_2nd: 30.
     lambda_opaque_2nd: 0. #1.
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 0.001
+    lambda_eikonal_2nd: 0.005
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. #100 #${system.loss.lambda_normal_smoothness_2d}
