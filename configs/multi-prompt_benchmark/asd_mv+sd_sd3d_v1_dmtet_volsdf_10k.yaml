@@ -41,6 +41,7 @@ system:
     sdf_bias: sphere
     sdf_bias_params: 0.5 # a small bias will be fine?
 
+    rotate_planes: v1
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
       training_type: "lora_rank_8_locon_rank_8_with_bias" # _with_bias
@@ -55,21 +56,11 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
-  background_type: "neural-environment-map-background"
+  background_type: "solid-color-background"
   background:
-    color_activation: sigmoid
+    color: [0.5, 0.5, 0.5]
     random_aug: false
-    random_aug_prob: 0.5
-    dir_encoding_config:
-      otype: HashGrid
-      n_features_per_level: 2
-      log2_hashmap_size: 19
-      n_levels: 4
-      base_resolution: 4
-      # desired_resolution = 256
-      per_level_scale: 4.0
-      # per_level_scale = np.exp2(np.log2(desired_resolution / base_resolution) / (num_levels - 1))
-
+    
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
     radius: ${system.geometry.radius}
@@ -98,6 +89,8 @@ system:
     negative_prompt_2nd: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
     gpu_split: false
     use_local_text_embeddings: true
+    use_view_dependent_text_embeddings: ["overhead", 'side', 'front'] # prompt the sd to generate plans that are view-dependent
+    
     # use_perp_neg: true
     # front_threshold: 30. # same as vsd
     # back_threshold: 30.
@@ -111,12 +104,14 @@ system:
     guidance_scale: 7.5
     plus_ratio: 0.1
     plus_random: true
-    min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDream
+    min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDrea
     max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
     sd_weight: 1.
     # sd_guidance_perp_neg: -0.5
     sd_view_dependent_prompting: false
     mv_weight: 1.
+    # dual_render_sync_t: true # sample same t for both renderers
+    
 
   loggers:
     wandb:
