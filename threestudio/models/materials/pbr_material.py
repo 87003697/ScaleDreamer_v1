@@ -37,6 +37,7 @@ class PBRMaterial(BaseMaterial):
             self.cfg.environment_texture, scale=self.cfg.environment_scale
         ).to(self.device)
         self.light.diffuse = self.light.diffuse.to(self.device)
+        self.light.specular = [l.to(self.device) for l in self.light.specular]
 
         FG_LUT = torch.from_numpy(
             np.fromfile("load/lights/bsdf_256_256.bin", dtype=np.float32).reshape(
