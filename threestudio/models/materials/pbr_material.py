@@ -35,13 +35,15 @@ class PBRMaterial(BaseMaterial):
 
         self.light = envlight.EnvLight(
             self.cfg.environment_texture, scale=self.cfg.environment_scale
-        )
+        ).to(self.device)
+        self.light.diffuse = self.light.diffuse.to(self.device)
+        self.light.specular = [l.to(self.device) for l in self.light.specular]
 
         FG_LUT = torch.from_numpy(
             np.fromfile("load/lights/bsdf_256_256.bin", dtype=np.float32).reshape(
                 1, 256, 256, 2
             )
-        )
+        ).to(self.device)
         self.register_buffer("FG_LUT", FG_LUT)
 
     def forward(
