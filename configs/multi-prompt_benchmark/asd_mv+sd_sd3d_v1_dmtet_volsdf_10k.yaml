@@ -44,11 +44,13 @@ system:
     rotate_planes: v1
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
-      training_type: "lora_rank_8_locon_rank_8_with_bias" # _with_bias
+      training_type: "lora_rank_32_locon_rank_32_with_bias" # _with_bias
       timestep: 999
       num_planes: 3
       output_dim: 32
       # gradient_checkpoint: true
+      lora_type: "vanilla" # "triple_v1" "vanilla"
+      locon_type: "vanilla_v2" # "triple_v1" "vanilla_v1" "vanilla_v2"
 
   material_type: no-material
   material:
@@ -159,7 +161,7 @@ trainer:
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
-  accumulate_grad_batches: 2
+  accumulate_grad_batches: 1
 
 checkpoint:
   save_last: true
