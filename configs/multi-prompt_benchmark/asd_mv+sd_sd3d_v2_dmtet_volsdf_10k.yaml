@@ -42,6 +42,7 @@ system:
     sdf_bias_params: 0.5 # a small bias will be fine?
 
     rotate_planes: v1
+    interpolate_feat: v1
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
       training_type: "lora_rank_32_locon_rank_32_with_bias" # _with_bias
