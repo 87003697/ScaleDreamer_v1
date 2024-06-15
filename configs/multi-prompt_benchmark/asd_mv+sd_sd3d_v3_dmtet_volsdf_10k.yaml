@@ -49,7 +49,7 @@ system:
       timestep: 999
       output_dim: 32
       # gradient_checkpoint: true
-      self_lora_type: "sparse_v1" # "triple_v1" "vanilla", "sparse_v1"
+      self_lora_type: "triple_v1" # "triple_v1" "vanilla", "sparse_v1"
       cross_lora_type: "vanilla" # "triple_v1" "vanilla"
       locon_type: "vanilla_v2" # "triple_v1" "triple_v2" "vanilla_v1" "vanilla_v2"
 
@@ -106,14 +106,21 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     weighting_strategy: "uniform"
-    guidance_scale: 7.5
-    plus_ratio: 0.1
-    plus_random: true
     min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDrea
     max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
+    # the following are specific to SD
     sd_weight: 1.
-    mv_weight: 1.
+    sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
+    # the following are specific to MV
+    mv_weight: 1.
+    mv_guidance_scale: 7.5
+    # the following are specific to ASD
+    plus_ratio: 0.1
+    plus_schedule: "linear"
+    # the following are specific to the combination of ASD with MV and SD
+    mv_plus_random: true
+    sd_plus_random: true
 
   loggers:
     wandb:
@@ -164,7 +171,7 @@ trainer:
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
-  accumulate_grad_batches: 2
+  accumulate_grad_batches: 1
 
 checkpoint:
   save_last: true
