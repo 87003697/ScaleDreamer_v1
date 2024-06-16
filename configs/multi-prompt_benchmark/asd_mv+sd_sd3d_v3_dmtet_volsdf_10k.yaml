@@ -49,8 +49,8 @@ system:
       timestep: 999
       output_dim: 32
       # gradient_checkpoint: true
-      self_lora_type: "triple_v1" # "triple_v1" "vanilla", "sparse_v1"
-      cross_lora_type: "vanilla" # "triple_v1" "vanilla"
+      self_lora_type: "triple_v4" # "triple_v1" "triple_v2" "triple_v3" "triple_v4" "vanilla", "sparse_v1"
+      cross_lora_type: "triple_v4" # "triple_v1" "triple_v3" "triple_v4" "vanilla"
       locon_type: "vanilla_v2" # "triple_v1" "triple_v2" "vanilla_v1" "vanilla_v2"
 
 
@@ -141,7 +141,7 @@ system:
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
-    lambda_sparsity_2nd: 30.
+    lambda_sparsity_2nd: 50.
     lambda_opaque_2nd: 0. #1.
     lambda_z_variance_2nd: 0.
     lambda_eikonal_2nd: 0.0005
