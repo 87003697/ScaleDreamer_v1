@@ -50,7 +50,7 @@ system:
       output_dim: 32
       # gradient_checkpoint: true
       self_lora_type: "triple_v4" # "triple_v1" "triple_v2" "triple_v3" "triple_v4" "vanilla", "sparse_v1"
-      cross_lora_type: "triple_v4" # "triple_v1" "triple_v3" "triple_v4" "vanilla"
+      cross_lora_type: "vanilla" # "triple_v1" "triple_v3" "triple_v4" "vanilla"
       locon_type: "vanilla_v2" # "triple_v1" "triple_v2" "vanilla_v1" "vanilla_v2"
 
 
@@ -114,10 +114,10 @@ system:
     dual_render_sync_view_sd: false # sample same view for both renderers    
     # the following are specific to MV
     mv_weight: 1.
-    mv_guidance_scale: 7.5
+    mv_guidance_scale: 3 #7.5
     # the following are specific to ASD
-    plus_ratio: 0.1
-    plus_schedule: "linear"
+    plus_ratio: 1.
+    plus_schedule: "sqrt_100"
     # the following are specific to the combination of ASD with MV and SD
     mv_plus_random: true
     sd_plus_random: true
@@ -141,10 +141,10 @@ system:
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
-    lambda_sparsity_2nd: 50.
+    lambda_sparsity_2nd: 10.
     lambda_opaque_2nd: 0. #1.
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 0.0005
+    lambda_eikonal_2nd: 0.0001
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. #100 #${system.loss.lambda_normal_smoothness_2d}
