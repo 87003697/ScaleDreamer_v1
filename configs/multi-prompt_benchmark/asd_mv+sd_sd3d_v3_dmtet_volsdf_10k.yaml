@@ -71,6 +71,7 @@ system:
     radius: ${system.geometry.radius}
     isosurface_remove_outliers: false
     isosurface_method: "mc-cpu"
+    enable_bg_rays: true
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
