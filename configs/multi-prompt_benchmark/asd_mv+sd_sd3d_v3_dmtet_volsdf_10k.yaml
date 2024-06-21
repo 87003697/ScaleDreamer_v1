@@ -112,11 +112,11 @@ system:
     sd_weight: 1.
     sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
-    sd_1st_render_only: true
+    sd_1st_render_only: false
     # the following are specific to MV
     mv_weight: 1.
     mv_guidance_scale: 7.5 #7.5
-    mv_2nd_render_only: true
+    mv_2nd_render_only: false
     # the following are specific to ASD
     plus_schedule: "sqrt_100"
     # the following are specific to the combination of ASD with MV and SD
