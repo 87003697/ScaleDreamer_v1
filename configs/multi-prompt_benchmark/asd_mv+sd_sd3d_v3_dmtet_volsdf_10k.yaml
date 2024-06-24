@@ -78,7 +78,7 @@ system:
     radius: ${system.geometry.radius}
     use_volsdf: true
     trainable_variance: false # important!
-    learned_variance_init: 0.340119 # 0.340119 = log(50) / 10, 50 is the most common variance across the prompts
+    learned_variance_init: 0.340119 #0.340119 # 0.340119 = log(30) / 10, 50 is the most common variance across the prompts
 
     estimator: importance
     num_samples_per_ray: 64
@@ -95,9 +95,9 @@ system:
     negative_prompt_2nd: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
     gpu_split: false
     use_local_text_embeddings: true
-    use_view_dependent_text_embeddings: ['side', 'front', 'back'] # prompt the sd to generate plans that are view-dependent
+    use_view_dependent_text_embeddings: ['side', 'none', 'back'] # prompt the sd to generate plans that are view-dependent
     
-    # use_perp_neg: true
+    # # use_perp_neg: true
     # front_threshold: 30. # same as vsd
     # back_threshold: 30.
 
@@ -106,7 +106,6 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    weighting_strategy: "uniform"
     min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDrea
     max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
     # the following are specific to SD
@@ -114,17 +113,19 @@ system:
     sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
     sd_1st_render_only: false
+    sd_weighting_strategy: "uniform"
     # the following are specific to MV
     mv_weight: 1.
     mv_guidance_scale: 7.5 #7.5
     mv_2nd_render_only: false
+    mv_weighting_strategy: "uniform"
     # the following are specific to ASD
-    plus_schedule: "sqrt_100"
+    plus_schedule: "linear"
     # the following are specific to the combination of ASD with MV and SD
     mv_plus_random: true
-    mv_plus_ratio: 1
+    mv_plus_ratio: 0.1
     sd_plus_random: true
-    sd_plus_ratio: 1
+    sd_plus_ratio: 0.1
 
 
 
