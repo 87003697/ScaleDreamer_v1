@@ -42,7 +42,7 @@ system:
     sdf_bias_params: 0.5 # a small bias will be fine?
 
     rotate_planes: v1
-    interpolate_feat: v3
+    interpolate_feat: v4
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
       training_type: "self_lora_rank_32-cross_lora_rank_32-locon_rank_32-with_bias" 
@@ -113,12 +113,12 @@ system:
     sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
     sd_1st_render_only: false
-    sd_weighting_strategy: "uniform"
+    sd_weighting_strategy: "sds"
     # the following are specific to MV
     mv_weight: 1.
     mv_guidance_scale: 7.5 #7.5
     mv_2nd_render_only: false
-    mv_weighting_strategy: "uniform"
+    mv_weighting_strategy: "sds"
     # the following are specific to ASD
     plus_schedule: "linear"
     # the following are specific to the combination of ASD with MV and SD
