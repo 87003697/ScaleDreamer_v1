@@ -21,7 +21,7 @@ data:
   relative_radius: true
   eval_camera_distance: 3.0
   eval_fovy_deg: 40.
-  n_val_views: 30
+  n_val_views: 40 # should be divisible by n_view
   # supervised data
   obj_library: "none"
   meta_json: "none"
@@ -38,10 +38,10 @@ data:
   # the prompt library is move from the system to the data module
   prompt_processor_type: "stable-diffusion-multi-prompt-processor-dual-uncond-callable"
   prompt_processor:
+    spawn: true
     pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     negative_prompt: ""
     negative_prompt_2nd: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
-    gpu_split: false
     use_local_text_embeddings: true
     use_view_dependent_text_embeddings: ['side', 'none', 'back'] # prompt the sd to generate plans that are view-dependent
 
