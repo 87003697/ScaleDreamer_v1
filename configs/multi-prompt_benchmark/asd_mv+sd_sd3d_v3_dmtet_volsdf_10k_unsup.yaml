@@ -13,6 +13,7 @@ data:
   height: 256
   ray_height: 64
   ray_width: 64
+  light_sample_strategy: "magic3d"
   # unsupervised data
   prompt_library: ???
   unsup_elevation_range: [0, 30]
@@ -77,12 +78,19 @@ system:
       cross_lora_type: "triple_v1" # "triple_v1" "triple_v3" "triple_v4" "triple_v5" "vanilla"
       locon_type: "vanilla_v1" # "triple_v1" "triple_v2" "vanilla_v1" "vanilla_v2"
 
+    n_feature_dims: 5 # required by pbr-material
 
-  material_type: no-material
+  material_type: pbr-material
   material:
-    n_output_dims: 3
-    requires_normal: true
-    color_activation: sigmoid-mipnerf # follow OpenLRM
+    material_activation: sigmoid-mipnerf # follow OpenLRM
+    use_bump: false
+    environment_scale: 2
+
+  # material_type: no-material
+  # material:
+  #   n_output_dims: 3
+  #   requires_normal: true
+  #   color_activation: sigmoid-mipnerf # follow OpenLRM
 
   background_type: "multi-prompt-neural-hashgrid-environment-map-background"
   background:
