@@ -18,6 +18,7 @@ from pytorch_lightning.loggers import WandbLogger
 from threestudio.models.mesh import Mesh
 from threestudio.utils.typing import *
 
+import threading
 
 class SaverMixin:
     _save_dir: Optional[str] = None
@@ -392,6 +393,44 @@ class SaverMixin:
         torch.save(data, save_path)
         return save_path
 
+    # def save_img_sequence(
+    #     self,
+    #     filename,
+    #     img_dir,
+    #     matcher,
+    #     save_format="mp4",
+    #     fps=30,
+    #     name: Optional[str] = None,
+    #     step: Optional[int] = None,
+    # ) -> str:
+    #     assert save_format in ["gif", "mp4"]
+    #     if not filename.endswith(save_format):
+    #         filename += f".{save_format}"
+    #     save_path = self.get_save_path(filename)
+    #     matcher = re.compile(matcher)
+    #     img_dir = os.path.join(self.get_save_dir(), img_dir)
+    #     imgs = []
+    #     for f in os.listdir(img_dir):
+    #         if matcher.search(f):
+    #             imgs.append(f)
+    #     imgs = sorted(imgs, key=lambda f: int(matcher.search(f).groups()[0]))
+    #     imgs = [cv2.imread(os.path.join(img_dir, f)) for f in imgs]
+
+    #     if save_format == "gif":
+    #         imgs = [cv2.cvtColor(i, cv2.COLOR_BGR2RGB) for i in imgs]
+    #         imageio.mimsave(save_path, imgs, fps=fps, palettesize=256)
+    #     elif save_format == "mp4":
+    #         imgs = [cv2.cvtColor(i, cv2.COLOR_BGR2RGB) for i in imgs]
+    #         imageio.mimsave(save_path, imgs, fps=fps)
+    #     if name and self._wandb_logger:
+    #         wandb.log(
+    #             {
+    #                 name: wandb.Video(save_path, format="mp4"),
+    #                 "trainer/global_step": step,
+    #             }
+    #         )
+    #     return save_path
+
     def save_img_sequence(
         self,
         filename,
@@ -401,6 +440,7 @@ class SaverMixin:
         fps=30,
         name: Optional[str] = None,
         step: Optional[int] = None,
+        multithreaded: bool = False
     ) -> str:
         assert save_format in ["gif", "mp4"]
         if not filename.endswith(save_format):
@@ -417,10 +457,20 @@ class SaverMixin:
 
         if save_format == "gif":
             imgs = [cv2.cvtColor(i, cv2.COLOR_BGR2RGB) for i in imgs]
-            imageio.mimsave(save_path, imgs, fps=fps, palettesize=256)
+            if multithreaded:
+                # threestudio.info("Multithreaded gif saving: {}".format(save_path))
+                thread = threading.Thread(target=imageio.mimsave, args=(save_path, imgs), kwargs={"fps": fps})
+                thread.start()
+            else:
+                imageio.mimsave(save_path, imgs, fps=fps, palettesize=256)
         elif save_format == "mp4":
             imgs = [cv2.cvtColor(i, cv2.COLOR_BGR2RGB) for i in imgs]
-            imageio.mimsave(save_path, imgs, fps=fps)
+            if multithreaded:
+                # threestudio.info("Multithreaded mp4 saving: {}".format(save_path))
+                thread = threading.Thread(target=imageio.mimsave, args=(save_path, imgs), kwargs={"fps": fps})
+                thread.start()
+            else:
+                imageio.mimsave(save_path, imgs, fps=fps)
         if name and self._wandb_logger:
             wandb.log(
                 {
