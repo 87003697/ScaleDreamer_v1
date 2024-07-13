@@ -66,16 +66,17 @@ system:
     sdf_bias_params: 0.5 # a small bias will be fine?
 
     rotate_planes: v1
-    interpolate_feat: v4
+    interpolate_feat: v7
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
-      training_type: "self_lora_rank_32-cross_lora_rank_32-locon_rank_32-with_bias" 
+      training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
       timestep: 999
       output_dim: 32
       # gradient_checkpoint: true
-      self_lora_type: "vanilla" # "triple_v1" "triple_v2" "triple_v3" "triple_v4" "triple_v5" "vanilla", "sparse_v1"
-      cross_lora_type: "triple_v1" # "triple_v1" "triple_v3" "triple_v4" "triple_v5" "vanilla"
+      self_lora_type: "triple_v1" # "triple_v1" "triple_v2" "triple_v3" "triple_v4" "triple_v5" "vanilla", "sparse_v1"
+      cross_lora_type: "triple_v1s" # "triple_v1" "triple_v3" "triple_v4" "triple_v5" "vanilla"
       locon_type: "vanilla_v1" # "triple_v1" "triple_v2" "vanilla_v1" "vanilla_v2"
+      prompt_bias: true
 
 
   material_type: no-material
@@ -116,8 +117,8 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    min_step_percent: [0, 0.5, 0.02, 500000] # follow MVDrea
-    max_step_percent: [0, 0.98, 0.5, 500000] # same as vsd
+    min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDrea
+    max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
     # the following are specific to SD
     sd_weight: 1.
     sd_guidance_scale: 7.5
@@ -189,7 +190,7 @@ trainer:
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
-  accumulate_grad_batches: 1
+  accumulate_grad_batches: 2
 
 checkpoint:
   save_last: true
