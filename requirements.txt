@@ -34,3 +34,7 @@ controlnet_aux
 
 # pickapic download
 datasets
+
+# Era3D
+segment_anything
+rembg
