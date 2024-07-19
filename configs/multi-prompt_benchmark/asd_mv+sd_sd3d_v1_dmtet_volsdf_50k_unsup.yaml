@@ -72,7 +72,7 @@ system:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
       training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
       timestep: 999
-      output_dim: 32
+      output_dim: 33
       # gradient_checkpoint: true
       self_lora_type: "triple_v1" # "triple_v1" "triple_v2" "triple_v3" "triple_v4" "triple_v5" "vanilla", "sparse_v1"
       cross_lora_type: "triple_v1" # "triple_v1" "triple_v3" "triple_v4" "triple_v5" "vanilla"
