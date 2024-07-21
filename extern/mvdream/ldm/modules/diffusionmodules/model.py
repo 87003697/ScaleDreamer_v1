@@ -16,6 +16,8 @@ except:
     XFORMERS_IS_AVAILBLE = False
     print("No module 'xformers'. Proceeding without it.")
 
+from torch.utils.checkpoint import checkpoint
+
 
 def get_timestep_embedding(timesteps, embedding_dim):
     """
@@ -515,7 +517,7 @@ class Encoder(nn.Module):
                                         stride=1,
                                         padding=1)
 
-    def forward(self, x):
+    def forward(self, x, gradient_checkpoint = False):
         # timestep embedding
         temb = None
 
@@ -523,12 +525,29 @@ class Encoder(nn.Module):
         hs = [self.conv_in(x)]
         for i_level in range(self.num_resolutions):
             for i_block in range(self.num_res_blocks):
-                h = self.down[i_level].block[i_block](hs[-1], temb)
+                h = self.down[i_level].block[i_block](hs[-1], temb) if not gradient_checkpoint else \
+                    checkpoint(
+                        self.down[i_level].block[i_block], 
+                        hs[-1], temb, 
+                        use_reentrant= not hs[-1].requires_grad
+                    )
                 if len(self.down[i_level].attn) > 0:
-                    h = self.down[i_level].attn[i_block](h)
+                    h = self.down[i_level].attn[i_block](h) if not gradient_checkpoint else \
+                        checkpoint(
+                            self.down[i_level].attn[i_block],
+                            h,
+                            use_reentrant= not h.requires_grad
+                        )
                 hs.append(h)
             if i_level != self.num_resolutions-1:
-                hs.append(self.down[i_level].downsample(hs[-1]))
+                h = self.down[i_level].downsample(hs[-1]) if not gradient_checkpoint else \
+                    checkpoint(
+                        self.down[i_level].downsample,
+                        hs[-1],
+                        use_reentrant= not hs[-1].requires_grad
+                    )
+                hs.append(h) 
+                    
 
         # middle
         h = hs[-1]
