@@ -44,7 +44,7 @@ data:
     negative_prompt: ""
     negative_prompt_2nd: "ugly, bad anatomy, blurry, pixelated obscure, unnatural colors, poor lighting, dull, and unclear, cropped, lowres, low quality, artifacts, duplicate, morbid, mutilated, poorly drawn face, deformed, dehydrated, bad proportions"
     use_local_text_embeddings: true
-    use_view_dependent_text_embeddings: ['uncond_1st', 'side', 'none'] # prompt the sd to generate plans that are view-dependent
+    use_view_dependent_text_embeddings: ['none', 'none', 'none'] # prompt the sd to generate plans that are view-dependent
 
     # use_perp_neg: true
     # front_threshold: 30. # same as vsd
