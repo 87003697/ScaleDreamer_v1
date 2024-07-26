@@ -60,8 +60,10 @@ system:
 
   # multi-step trianing / inference
   num_steps_training: 4
-  classifier_guidance_scale: 1
   num_steps_sampling: 50
+  classifier_guidance_scale: 1
+  noise_scheduler: "ddpm"
+  sample_scheduler: "ddim"
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
 
@@ -203,7 +205,7 @@ trainer:
   log_every_n_steps: 1
   num_sanity_val_steps: 0
   # val_check_interval: 1 #2500 #10000
-  check_val_every_n_epoch: 400
+  check_val_every_n_epoch: 100
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
