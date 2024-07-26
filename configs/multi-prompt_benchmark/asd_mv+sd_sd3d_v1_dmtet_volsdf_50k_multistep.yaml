@@ -94,11 +94,16 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
+  # background_type: "neural-environment-map-background"
+  # background:
+  #   color_activation: sigmoid
+  #   random_aug: false
+
   background_type: "multi-prompt-neural-hashgrid-environment-map-background"
   background:
     color_activation: sigmoid-mipnerf # follow OpenLRM
     random_aug: false
-    # eval_color: [0.5, 0.5, 0.5]
+    eval_color: [0.5, 0.5, 0.5]
 
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
