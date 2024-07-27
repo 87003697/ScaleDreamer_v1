@@ -36,7 +36,7 @@ data:
   dim_gaussian: [3, 4, 32, 32] # not used
   pure_zeros: false
   # for training
-  n_steps: ${system.num_steps_training}
+  n_steps: ${system.num_parts_training}
 
   # the prompt library is move from the system to the data module
   prompt_processor_type: "stable-diffusion-multi-prompt-processor-dual-uncond-callable"
@@ -60,18 +60,20 @@ system:
 
   # multi-step trianing / inference
   num_parts_training: 4 # TBD
+  split_parts: v2
   num_steps_training: 50 # TBD
   num_steps_sampling: 50
   noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
-  classifier_guidance_scale: 1 
+  classifier_guidance_scale_training: 1. # any of 1, 7.5, or other values
+  classifier_guidance_scale_sampling: 1. # any of 1, 7.5, or other values
   pure_zeros_training: false # TBD
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
 
   geometry_type: "one-step-triplane-stable-diffusion"
   geometry:
-    radius: 1. #1.5 shrink a bit
+    radius: 1. 
     normal_type: "finite_difference"
     finite_difference_normal_eps: 0.01
 
@@ -98,16 +100,12 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
-  # background_type: "neural-environment-map-background"
-  # background:
-  #   color_activation: sigmoid
-  #   random_aug: false
 
   background_type: "multi-prompt-neural-hashgrid-environment-map-background"
   background:
     color_activation: sigmoid-mipnerf # follow OpenLRM
     random_aug: false
-    eval_color: [0.5, 0.5, 0.5]
+    eval_color: [1., 1., 1.]
 
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
