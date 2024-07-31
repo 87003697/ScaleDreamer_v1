@@ -61,13 +61,14 @@ system:
   # multi-step trianing / inference
   num_parts_training: 4 # TBD
   split_parts: v2
+  
   num_steps_training: 50 # TBD
   num_steps_sampling: 50
   noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
-  classifier_guidance_scale_training: 7.5 # any of 1, 7.5, or other values
-  classifier_guidance_scale_sampling: 7.5 # any of 1, 7.5, or other values
-  pure_zeros_training: false # TBD
+  classifier_guidance_scale_training: 1 # any of 1, 7.5, or other values
+  classifier_guidance_scale_sampling: 4 # any of 1, 7.5, or other values
+  noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
 
@@ -83,7 +84,7 @@ system:
     rotate_planes: v2
     interpolate_feat: v3
     space_generator_config:
-      pretrained_model_name_or_path: "pretrained/sd-turbo" # TBD
+      pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
       training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
       timestep: 999
       output_dim: 33
@@ -92,6 +93,7 @@ system:
       cross_lora_type: "triple_v1"
       locon_type: "vanilla_v1"
       prompt_bias: true
+      prompt_bias_lr_multiplier: 3.1622 # math.sqrt(10) = 3.1622 increase the learning rate to 10 times
 
 
   material_type: no-material
@@ -167,6 +169,8 @@ system:
       name: None
 
   loss:
+    weighting_strategy: "v2" # any of "v1", "v2"
+
     lambda_asd: 1
     lambda_orient: 0.
     lambda_sparsity: 0
