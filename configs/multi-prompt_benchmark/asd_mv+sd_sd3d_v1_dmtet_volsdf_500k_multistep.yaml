@@ -61,13 +61,12 @@ system:
   # multi-step trianing / inference
   num_parts_training: 4 # TBD
   split_parts: v2
-  
-  num_steps_training: 50 # TBD
-  num_steps_sampling: 50
+  num_steps_training: 4 # TBD
+  num_steps_sampling: 4
   noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
   classifier_guidance_scale_training: 1 # any of 1, 7.5, or other values
-  classifier_guidance_scale_sampling: 4 # any of 1, 7.5, or other values
+  classifier_guidance_scale_sampling: 2 # any of 1, 7.5, or other values
   noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
@@ -138,7 +137,7 @@ system:
     min_step_percent: [0, 0.5, 0.02, 500000] # follow MVDrea
     max_step_percent: [0, 0.98, 0.5, 500000] # same as vsd
     # the following are specific to SD
-    sd_weight: 1.
+    sd_weight: 0.
     sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
     sd_1st_render_only: false
@@ -157,6 +156,7 @@ system:
     sd_plus_ratio: 0.1
     # try to save memory cost
     gradient_checkpoint: true
+    auto_grad: true
 
 
 
@@ -169,7 +169,7 @@ system:
       name: None
 
   loss:
-    weighting_strategy: "v2" # any of "v1", "v2"
+    weighting_strategy: "v1" # any of "v1", "v2"
 
     lambda_asd: 1
     lambda_orient: 0.
@@ -183,7 +183,7 @@ system:
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
-    lambda_sparsity_2nd: 10.
+    lambda_sparsity_2nd: 0.1
     lambda_opaque_2nd: 0. #1.
     lambda_z_variance_2nd: 0.
     lambda_eikonal_2nd: 0.0001
