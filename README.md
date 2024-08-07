@@ -67,3 +67,18 @@ cd <your repo directory>
 python scripts/download_pretrained_models.py
 ```
 </details>
+
+## 🕹️ Experiments
+
+### Group-0 08.07.2024
+```sh
+sh scripts/group_0/exp1_3DTopia_step_4_triple_triple_vanilla_rank_16_b_lora_prompt_25k_50k.sh
+```
+
+```sh
+sh scripts/group_0/exp2_3DTopia_step_4_triple_triple_vanilla_rank_16_b_lora_prompt_50k_50k.sh
+```
+Each experiment lasts for around 5 days.
+Results are saved in `outputs_group_0` directory.
+
+
