@@ -12,6 +12,15 @@
 conda create -n scaledreamer python=3.10
 conda activate scaledreamer
 ```
+- Add plugin
+
+```sh
+mkdir custom
+cd custom
+git clone https://github.com/87003697/amortized
+cd ..
+```
+
 - Install PyTorch
 ```sh
 # Prefer using the latest version of CUDA and PyTorch 
