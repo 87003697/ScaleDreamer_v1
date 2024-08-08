@@ -176,7 +176,7 @@ system:
     lambda_opaque: 0 # final 1/5 iterations
     lambda_z_variance: 0.
     lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
-    lambda_normal_consistency: 100. #10.
+    lambda_normal_consistency: 0. #10.
     lambda_laplacian_smoothness: 0. #10.
     lambda_normal_smoothness_2d: 0.
 
