@@ -70,13 +70,23 @@ python scripts/download_pretrained_models.py
 
 ## 🕹️ Experiments
 
-### Group-0 08.07.2024
+### Git update
+
+Use the following code to update the code to the latest version
 ```sh
-sh scripts/group_0/exp1_3DTopia_step_4_triple_triple_vanilla_rank_16_b_lora_prompt_25k_50k.sh
+git pull
+cd custom/amortized
+git pull
+cd ../..
+```
+
+### Group-0 08.08.2024
+```sh
+sh scripts/group_0/exp1_3DTopia_step_scheduler_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
 ```
 
 ```sh
-sh scripts/group_0/exp2_3DTopia_step_4_triple_triple_vanilla_rank_16_b_lora_prompt_50k_50k.sh
+sh scripts/group_0/exp2_3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
 ```
 Each experiment lasts for around 5 days.
 Results are saved in `outputs_group_0` directory.
