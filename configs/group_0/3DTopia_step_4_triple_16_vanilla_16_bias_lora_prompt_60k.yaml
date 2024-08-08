@@ -1,4 +1,4 @@
-name: "3DTopia_step_4_triple_triple_vanilla_rank_16_b_lora_prompt_25k_50k"
+name: "3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_group_0"
 seed: 0
@@ -67,9 +67,10 @@ system:
   sample_scheduler: "ddim" 
   classifier_guidance_scale_training: 1 # any of 1, 7.5, or other values
   classifier_guidance_scale_sampling: 2 # any of 1, 7.5, or other values
-  noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
+  noise_addition: "gaussian" 
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
+  specifiy_guidance_timestep: null # any of null, v1
 
   geometry_type: "one-step-triplane-stable-diffusion"
   geometry:
@@ -92,7 +93,7 @@ system:
       cross_lora_type: "triple_v1"
       locon_type: "vanilla_v1"
       prompt_bias: true
-      prompt_bias_lr_multiplier: 3 # increase the learning rate to 3
+      prompt_bias_lr_multiplier: 3 #3.1622 # math.sqrt(10) = 3.1622 increase the learning rate to 10 times
 
 
   material_type: no-material
@@ -101,12 +102,10 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
-
-  background_type: "multi-prompt-neural-hashgrid-environment-map-background"
+  background_type: "solid-color-background"
   background:
-    color_activation: sigmoid-mipnerf # follow OpenLRM
     random_aug: false
-    eval_color: [1., 1., 1.]
+    color: [0.5, 0.5, 0.5]
 
   renderer_type: generative-space-dmtet-rasterize-renderer
   renderer:
@@ -134,8 +133,8 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    min_step_percent: [0, 0.5, 0.02, 25000] # follow MVDrea
-    max_step_percent: [0, 0.98, 0.5, 25000] # same as vsd
+    min_step_percent: 0.5 #[0, 0.5, 0.02, 500000]
+    max_step_percent: 0.98 #[0, 0.98, 0.5, 500000]
     # the following are specific to SD
     sd_weight: 0.
     sd_guidance_scale: 7.5
@@ -177,7 +176,7 @@ system:
     lambda_opaque: 0 # final 1/5 iterations
     lambda_z_variance: 0.
     lambda_eikonal: 0. #0.1 #[1, 10., 1., 10000] # fisrt 1/10 iterations
-    lambda_normal_consistency: 0. #10.
+    lambda_normal_consistency: 100. #10.
     lambda_laplacian_smoothness: 0. #10.
     lambda_normal_smoothness_2d: 0.
 
@@ -205,7 +204,7 @@ system:
 
 
 trainer:
-  max_steps: 50000
+  max_steps: 60000
   log_every_n_steps: 1
   num_sanity_val_steps: 0
   val_check_interval: 10000
