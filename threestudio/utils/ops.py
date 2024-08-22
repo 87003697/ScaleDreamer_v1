@@ -53,6 +53,17 @@ class _TruncExp(Function):  # pylint: disable=abstract-method
         x = ctx.saved_tensors[0]
         return g * torch.exp(torch.clamp(x, max=15))
 
+class CustomMultiply(Function):
+    @staticmethod
+    @custom_fwd
+    def forward(ctx, scalar, input_tensor):
+        return scalar * input_tensor
+
+    @staticmethod
+    @custom_bwd
+    def backward(ctx, grad_scale):
+        return None, grad_scale
+    
 
 class SpecifyGradient(Function):
     # Implementation from stable-dreamfusion
