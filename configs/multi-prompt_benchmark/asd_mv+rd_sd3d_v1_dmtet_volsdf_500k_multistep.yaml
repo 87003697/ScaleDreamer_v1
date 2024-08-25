@@ -70,7 +70,7 @@ system:
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
   specifiy_guidance_timestep: v2 # any of null, v1
-  predition_type: "sample" # any of "epsilon", "sample"
+  predition_type: "sample_delta_v2" # any of "epsilon", "sample", "sample_delta", "sample_delta_v2"
 
   geometry_type: "one-step-triplane-stable-diffusion"
   geometry:
