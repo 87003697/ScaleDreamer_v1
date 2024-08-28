@@ -19,6 +19,7 @@ class SolidColorBackground(BaseBackground):
         learned: bool = False
         random_aug: bool = False
         random_aug_prob: float = 0.5
+        eval_color: Optional[Tuple[float, float, float]] = None
 
     cfg: Config
 
@@ -34,6 +35,10 @@ class SolidColorBackground(BaseBackground):
             )
 
     def forward(self, dirs: Float[Tensor, "B H W 3"]) -> Float[Tensor, "B H W Nc"]:
+        if not self.training and self.cfg.eval_color is not None:
+            return torch.ones(*dirs.shape[:-1], self.cfg.n_output_dims).to(
+                dirs
+            ) * torch.as_tensor(self.cfg.eval_color).to(dirs)
         color = torch.ones(*dirs.shape[:-1], self.cfg.n_output_dims).to(
             dirs
         ) * self.env_color.to(dirs)
