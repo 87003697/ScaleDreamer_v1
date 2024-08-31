@@ -25,16 +25,26 @@ git+https://github.com/ashawkey/envlight.git
 torchmetrics
 pytorch-lightning==2.0.0
 
-# 3d gaussian
-plyfile
+# # 3d gaussian
+# plyfile
 
-#controlnet
-controlnet_aux
+# diffmc
+diso
 
 
-# pickapic download
-datasets
+# #controlnet
+# controlnet_aux
 
-# Era3D
-segment_anything
-rembg
+
+# # pickapic download
+# datasets
+
+# # Era3D
+# segment_anything
+# rembg
+
+# # zero123
+# taming-transformers-rom1504 
+# clip
+# kornia
+# git+https://github.com/openai/CLIP.git
