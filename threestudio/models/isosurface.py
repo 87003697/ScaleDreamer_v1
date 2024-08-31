@@ -15,6 +15,51 @@ class IsosurfaceHelper(nn.Module):
     def grid_vertices(self) -> Float[Tensor, "N 3"]:
         raise NotImplementedError
 
+# added by Zhiyuan ########################################
+class DiffMarchingCubeHelper(IsosurfaceHelper):
+    def __init__(self, resolution: int) -> None:
+        super().__init__()
+        self.resolution = resolution
+        from diso import DiffMC
+        self.mc_func: Callable = DiffMC(dtype=torch.float32)
+        self._grid_vertices: Optional[Float[Tensor, "N3 3"]] = None
+        self._dummy: Float[Tensor, "..."]
+        self.register_buffer(
+            "_dummy", torch.zeros(0, dtype=torch.float32), persistent=False
+        )
+
+    @property
+    def grid_vertices(self) -> Float[Tensor, "N3 3"]:
+        if self._grid_vertices is None:
+            # keep the vertices on CPU so that we can support very large resolution
+            x, y, z = (
+                torch.linspace(0, 1, self.resolution),
+                torch.linspace(0, 1, self.resolution),
+                torch.linspace(0, 1, self.resolution),
+            )
+            x, y, z = torch.meshgrid(x, y, z, indexing="ij")
+            verts = torch.stack([x, y, z], dim=-1).reshape(-1, 3)
+            verts = verts * (self.points_range[1] - self.points_range[0]) + self.points_range[0]
+
+            self._grid_vertices = verts
+        return self._grid_vertices
+
+    def forward(
+        self,
+        level: Float[Tensor, "N3 1"],
+        deformation: Optional[Float[Tensor, "N3 3"]] = None,
+    ) -> Mesh:
+        level = level.view(self.resolution, self.resolution, self.resolution)
+        if deformation is not None:
+            deformation = deformation.view(self.resolution, self.resolution, self.resolution, 3)
+        v_pos, t_pos_idx = self.mc_func(level, deformation, isovalue=0.0)
+        v_pos = v_pos * (self.points_range[1] - self.points_range[0]) + self.points_range[0]
+        # TODO: if the mesh is good
+        return Mesh(v_pos=v_pos, t_pos_idx=t_pos_idx)
+
+
+
+##############################################
 
 class MarchingCubeCPUHelper(IsosurfaceHelper):
     def __init__(self, resolution: int) -> None:
