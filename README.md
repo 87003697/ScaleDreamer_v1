@@ -1,4 +1,4 @@
-# SD-to-Triplane: Taming Stable Diffusion as Triplane Generator for Efficient Text/Image-to-3D
+# TriplaneTurbo: Instant Text-to-3D Generator from Multiple 2D Diffusion Priors
 ## Paper | Project Page
 
 ## ⚙️ Dependencies and Installation
@@ -105,12 +105,12 @@ wget https://virutalbuy-public.oss-cn-hangzhou.aliyuncs.com/share/RichDreamer/nd
 ``` 
 
 ```sh
-sh scripts/group_0/exp1_3DTopia_step_scheduler_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
+sh scripts/group_1/exp1_3DTopia__base_step_4__asd_mv+rd+sd_volsdf+cpumc__triple_16_vanilla_16_bias_lora_prompt.sh
 ```
 
 ```sh
-sh scripts/group_0/exp2_3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
+sh scripts/group_1/exp2_3DTopia__turbo_step_4__asd_mv+rd+sd_volsdf+cpumc__triple_16_vanilla_16_bias_lora_prompt.sh
 ```
-Each experiment lasts for around 5 days.
-Results are saved in `outputs_group_0` directory.
+Each experiment lasts for around 7 days.
+Results are saved in `outputs_group_1` directory.
 
