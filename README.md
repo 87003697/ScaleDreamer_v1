@@ -91,4 +91,26 @@ sh scripts/group_0/exp2_3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k
 Each experiment lasts for around 5 days.
 Results are saved in `outputs_group_0` directory.
 
+### Group-0 09.06.2024
+
+Update with the following step:
+
+1. Please git update first.
+
+2. Please prepare sd-turbo and sd-v1.5 into `pretrained` directory.
+  
+3. Run the following script to download another diffusion prior
+```sh
+wget https://virutalbuy-public.oss-cn-hangzhou.aliyuncs.com/share/RichDreamer/nd_mv_ema.ckpt -O ./pretrained/nd_mv_ema.ckpt
+``` 
+
+```sh
+sh scripts/group_0/exp1_3DTopia_step_scheduler_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
+```
+
+```sh
+sh scripts/group_0/exp2_3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k.sh
+```
+Each experiment lasts for around 5 days.
+Results are saved in `outputs_group_0` directory.
 
