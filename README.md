@@ -95,7 +95,7 @@ Results are saved in `outputs_group_0` directory.
 
 Update with the following step:
 
-1. Please git update first.
+1. Please git update first. Run `git pull` in two directories, as explained ⬆️.
 
 2. Please prepare sd-turbo and sd-v1.5 into `pretrained` directory.
   
