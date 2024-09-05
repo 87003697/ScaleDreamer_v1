@@ -102,7 +102,18 @@ Update with the following step:
 3. Run the following script to download another diffusion prior
 ```sh
 wget https://virutalbuy-public.oss-cn-hangzhou.aliyuncs.com/share/RichDreamer/nd_mv_ema.ckpt -O ./pretrained/nd_mv_ema.ckpt
-``` 
+```
+Now the files in `pretrained` directory is as follows. A little bit messy but will be refined in the future.
+```
+pretrained
+├── sd-turbo
+├── stable-diffusion-v1-5
+├── stable-diffusion-2-1-base
+├── nd_mv_ema.ckpt
+├── sd-v2.1-base-4view
+```
+
+Two experiments are as follows.
 
 ```sh
 sh scripts/group_1/exp1_3DTopia__base_step_4__asd_mv+rd+sd_volsdf+cpumc__triple_16_vanilla_16_bias_lora_prompt.sh
