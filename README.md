@@ -91,7 +91,7 @@ sh scripts/group_0/exp2_3DTopia_step_4_triple_16_vanilla_16_bias_lora_prompt_60k
 Each experiment lasts for around 5 days.
 Results are saved in `outputs_group_0` directory.
 
-### Group-0 09.06.2024
+### Group-0 09.05.2024
 
 Update with the following step:
 
