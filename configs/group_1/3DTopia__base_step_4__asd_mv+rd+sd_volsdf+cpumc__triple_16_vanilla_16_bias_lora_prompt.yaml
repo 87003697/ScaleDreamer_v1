@@ -84,9 +84,9 @@ system:
     interpolate_feat: v1
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-      training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
+      training_type: "self_lora_rank_32-cross_lora_rank_32-locon_rank_32-with_bias" 
       timestep: 999
-      output_dim: 33
+      output_dim: 32
       # gradient_checkpoint: true
       self_lora_type: "triple_v1"
       cross_lora_type: "triple_v1"
@@ -94,6 +94,8 @@ system:
       prompt_bias: true
       prompt_bias_lr_multiplier: 3 #3.1622 # math.sqrt(10) = 3.1622 increase the learning rate to 10 times
 
+      conv_out_initiation: v1
+    encode_position: null
 
   material_type: no-material
   material:
@@ -191,6 +193,7 @@ system:
     lambda_normal_consistency: 0. #10.
     lambda_laplacian_smoothness: 0. #10.
     lambda_normal_smoothness_2d: 0.
+    lambda_sdf_abs: 0.
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
@@ -201,6 +204,7 @@ system:
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. #100 #${system.loss.lambda_normal_smoothness_2d}
+    lambda_sdf_abs_2nd: 0. # should not be used!
 
   optimizer:
     name: Adan # for fast convergence
