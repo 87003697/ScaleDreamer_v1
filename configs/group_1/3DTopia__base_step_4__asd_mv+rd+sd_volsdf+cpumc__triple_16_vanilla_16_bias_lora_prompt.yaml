@@ -122,7 +122,7 @@ system:
     radius: ${system.geometry.radius}
     use_volsdf: true
     trainable_variance: false # important!
-    learned_variance_init: 0.340119 #0.340119 # 0.340119 = log(30) / 10, 50 is the most common variance across the prompts
+    learned_variance_init: 0.3689  # 0.3689 = log(40) / 10, 40 is the most common variance across the prompts
 
     estimator: importance
     num_samples_per_ray: 64
