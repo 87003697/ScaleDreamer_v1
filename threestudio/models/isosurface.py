@@ -48,11 +48,12 @@ class DiffMarchingCubeHelper(IsosurfaceHelper):
         self,
         level: Float[Tensor, "N3 1"],
         deformation: Optional[Float[Tensor, "N3 3"]] = None,
+        isovalue=0.0,
     ) -> Mesh:
         level = level.view(self.resolution, self.resolution, self.resolution)
         if deformation is not None:
             deformation = deformation.view(self.resolution, self.resolution, self.resolution, 3)
-        v_pos, t_pos_idx = self.mc_func(level, deformation, isovalue=0.0)
+        v_pos, t_pos_idx = self.mc_func(level, deformation, isovalue=isovalue)
         v_pos = v_pos * (self.points_range[1] - self.points_range[0]) + self.points_range[0]
         # TODO: if the mesh is good
         return Mesh(v_pos=v_pos, t_pos_idx=t_pos_idx)
