@@ -92,7 +92,7 @@ system:
       cross_lora_type: "triple_v1"
       locon_type: "vanilla_v1"
       prompt_bias: true
-      prompt_bias_lr_multiplier: 3 #3.1622 # math.sqrt(10) = 3.1622 increase the learning rate to 10 times
+      prompt_bias_lr_multiplier: 1 #3.1622 # math.sqrt(10) = 3.1622 increase the learning rate to 10 times
 
       conv_out_initiation: null
     encode_position: null
