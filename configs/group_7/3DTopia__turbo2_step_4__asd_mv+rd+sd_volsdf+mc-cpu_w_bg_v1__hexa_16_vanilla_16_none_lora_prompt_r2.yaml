@@ -5,7 +5,7 @@ seed: 0
 
 data_type: "multiview-multiprompt-dualrenderer-multistep-datamodule-v2"
 data:
-  batch_size: 8 # should be the multiple of n_views
+  batch_size: 4 # should be the multiple of n_views
   n_view: 4 
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
