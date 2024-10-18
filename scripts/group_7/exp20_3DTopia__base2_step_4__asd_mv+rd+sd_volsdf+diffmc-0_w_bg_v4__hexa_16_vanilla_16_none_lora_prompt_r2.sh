@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=1,2,3,4  python launch.py \
+CUDA_VISIBLE_DEVICES=0,1,2,3  python launch.py \
     --config configs/group_7/3DTopia__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-0_w_bg_v4__hexa_16_vanilla_16_none_lora_prompt_r2.yaml \
     --train \
     data.prompt_library="3DTopia_361k_prompt_library" \
