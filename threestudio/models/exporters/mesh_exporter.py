@@ -27,7 +27,7 @@ class MeshExporter(Exporter):
         texture_format: str = "jpg"
         xatlas_chart_options: dict = field(default_factory=dict)
         xatlas_pack_options: dict = field(default_factory=dict)
-        context_type: str = "gl"
+        context_type: str = "cuda"
 
     cfg: Config
 
