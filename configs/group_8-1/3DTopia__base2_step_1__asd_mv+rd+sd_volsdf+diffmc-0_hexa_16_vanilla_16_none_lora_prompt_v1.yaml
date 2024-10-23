@@ -61,9 +61,9 @@ system:
   parallel_guidance: true
 
   # multi-step trianing / inference
-  num_parts_training: 4 # TBD
-  num_steps_training: 4 # TBD
-  num_steps_sampling: 4
+  num_parts_training: 1 # TBD
+  num_steps_training: 1 # TBD
+  num_steps_sampling: 1
   noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
   noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
