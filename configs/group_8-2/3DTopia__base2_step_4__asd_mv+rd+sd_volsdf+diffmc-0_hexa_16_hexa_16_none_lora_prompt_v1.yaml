@@ -89,7 +89,7 @@ system:
       # gradient_checkpoint: true
       self_lora_type: "hexa_v1"
       cross_lora_type: "hexa_v1"
-      locon_type: "hexa"
+      locon_type: "hexa_v1"
       prompt_bias: false
       # prompt_bias_lr_multiplier: 1
 
