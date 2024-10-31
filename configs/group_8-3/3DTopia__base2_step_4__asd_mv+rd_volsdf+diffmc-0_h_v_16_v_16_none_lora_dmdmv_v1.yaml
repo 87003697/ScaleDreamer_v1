@@ -1,11 +1,11 @@
-name: "3DTopia__base2_step_4__data-only_volsdf+diffmc-0_hexa_16_vanilla_16_wobias_lora_prompt_v1"
+name: "3DTopia__base2_step_4__asd_mv+rd_volsdf+diffmc-0_h_v_16_v_16_none_lora_dmdmv_v1"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_8-3"
 seed: 0
 
-data_type: "multiview-multiprompt-dualrenderer-multistep-datamodule-v3"
+data_type: "multiview-multiprompt-dualrenderer-multistep-datamodule-v2"
 data:
-  batch_size: 4 # should be the multiple of n_views
+  batch_size: 8 # should be the multiple of n_views
   n_view: 4 
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
@@ -14,7 +14,7 @@ data:
   ray_height: 64
   ray_width: 64
   # unsupervised data
-  prompt_library: "T3Bench+Dreamfusion_v1_prompt_library"
+  prompt_library: ???
   unsup_elevation_range: [0, 30]
   unsup_camera_distance_range: [0.8, 1.0] # relative
   unsup_fovy_range: [15, 60]
@@ -24,7 +24,13 @@ data:
   n_val_views: 40
   n_test_views: 120
   # supervised data
-  obj_library: ???
+  obj_library: "none"
+  meta_json: "none"
+  rgb_data_dir: "none"
+  normal_data_dir: "none"
+  depth_data_dir: "none"
+  camera_data_dir: "none"
+  frontal_idx: 24 # 24 is the frontal view
   # the sup / unsup ratio, for training
   sup_unsup_mode: "vanilla" # "vanilla"
   dim_gaussian: [6, 4, 32, 32] # not used
@@ -48,7 +54,7 @@ data:
     negative_prompt: ""
     use_local_text_embeddings: true
 
-system_type: "multiprompt-dual-renderer-semisup-generator-system"
+system_type: "multiprompt-dual-renderer-multistep-generator-system"
 system:
   initialize_shape: false # #true #
   visualize_samples: false 
@@ -84,8 +90,8 @@ system:
       self_lora_type: "hexa_v1"
       cross_lora_type: "vanilla"
       locon_type: "vanilla_v1"
-      prompt_bias: true
-      prompt_bias_lr_multiplier: 1
+      prompt_bias: false
+      # prompt_bias_lr_multiplier: 1
 
     isosurface_deformable_grid: true
 
@@ -141,7 +147,7 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 3.
     mv_guidance_scale: 7.5 #7.5
-    mv_weighting_strategy: "sds_sqrt"
+    mv_weighting_strategy: "dmd_mv"
 
     # the following are specific to RD
     rd_min_step_percent: 0.5
@@ -150,7 +156,7 @@ system:
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "sds_sqrt"
+    rd_weighting_strategy: "dmd_mv"
     # cam_method: "rel_x2" # "rel_x2", "rel" or "abs"
 
     rd_use_sds: false
@@ -158,9 +164,9 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: [0, 0.1, 1., 30000]
+    sd_weight: 0. #[0, 0.1, 1., 30000]
     sd_guidance_scale: 7.5
-    sd_weighting_strategy: "sds_sqrt"
+    sd_weighting_strategy: "dmd_mv"
 
     # the following are specific to ASD
     plus_schedule: "linear"
@@ -175,9 +181,6 @@ system:
     # try to save memory cost
     gradient_checkpoint: true
     auto_grad: true
-
-
-
 
 
 
@@ -228,8 +231,8 @@ trainer:
   max_steps: 500000
   log_every_n_steps: 1
   num_sanity_val_steps: 0
-  val_check_interval: 1 #10000
-  # check_val_every_n_epoch: 1
+  val_check_interval: 10000
+  # check_val_every_n_epoch: 50
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
