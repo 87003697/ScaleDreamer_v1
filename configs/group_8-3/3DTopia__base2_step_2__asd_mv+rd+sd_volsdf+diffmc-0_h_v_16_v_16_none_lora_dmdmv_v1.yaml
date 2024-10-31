@@ -1,4 +1,4 @@
-name: "3DTopia__base2_step_2__asd_mv+rd+sd_volsdf+diffmc-0_h_v_16_v_16_none_lora_dmdmv_v1
+name: "3DTopia__base2_step_2__asd_mv+rd+sd_volsdf+diffmc-0_h_v_16_v_16_none_lora_dmdmv_v1"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_8-3"
 seed: 0
