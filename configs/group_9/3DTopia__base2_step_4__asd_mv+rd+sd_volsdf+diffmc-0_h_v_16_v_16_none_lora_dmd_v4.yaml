@@ -156,7 +156,7 @@ system:
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "dmd"
+    rd_weighting_strategy: "uniform"
     # cam_method: "rel_x2" # "rel_x2", "rel" or "abs"
 
     rd_use_sds: false
