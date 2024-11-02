@@ -145,7 +145,7 @@ system:
     # the following are specific to MV
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
-    mv_weight: 3.
+    mv_weight: 0.
     mv_guidance_scale: 7.5 #7.5
     mv_weighting_strategy: "dmd"
 
