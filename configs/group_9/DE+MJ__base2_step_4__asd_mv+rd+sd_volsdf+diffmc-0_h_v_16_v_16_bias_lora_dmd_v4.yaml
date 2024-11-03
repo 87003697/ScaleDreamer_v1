@@ -1,11 +1,11 @@
-name: "3DTopia__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-0_full_dmd_v4"
+name: "DE+MJ__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-0_h_v_16_v_16_bias_lora_dmd_v4"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_9"
 seed: 0
 
 data_type: "multiview-multiprompt-dualrenderer-multistep-datamodule-v2"
 data:
-  batch_size: 4 # should be the multiple of n_views
+  batch_size: 8 # should be the multiple of n_views
   n_view: 4 
   # 0-4999: 64x64, >=5000: 512x512
   # this drastically reduces VRAM usage as empty space is pruned in early training
@@ -83,20 +83,15 @@ system:
     rotate_planes: v2
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
+      training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16" 
       timestep: 999
       output_dim: 32
-
-      training_type: "full"
-      # training_type: "self_lora_rank_96-cross_lora_rank_16-locon_rank_16" 
-      # self_lora_type: "vanilla"
-      # cross_lora_type: "vanilla"
-      # locon_type: "vanilla_v1"
-
-
+      # gradient_checkpoint: true
+      self_lora_type: "hexa_v1"
+      cross_lora_type: "vanilla"
+      locon_type: "vanilla_v1"
       prompt_bias: true
       prompt_bias_lr_multiplier: 1
-
-      # gradient_checkpoint: true
 
     # isosurface_deformable_grid: true
 
@@ -240,7 +235,7 @@ trainer:
   # check_val_every_n_epoch: 50
   enable_progress_bar: true
   precision: 32
-  strategy: "ddp" #"ddp_find_unused_parameters_true" # "deepspeed_stage_2"
+  strategy: "ddp" # "deepspeed_stage_2"
   accumulate_grad_batches: 1 # > 1 is not supported
 
 checkpoint:
