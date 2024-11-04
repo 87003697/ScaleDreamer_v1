@@ -169,7 +169,7 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: [0, 0.1, 1., 30000]
+    sd_weight: 1.
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd"
 
@@ -211,10 +211,10 @@ system:
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
-    lambda_sparsity_2nd: 1.
+    lambda_sparsity_2nd: 0.01
     lambda_opaque_2nd: 0. 
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 1.
+    lambda_eikonal_2nd: 0.1
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. 
