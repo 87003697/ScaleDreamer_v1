@@ -1,4 +1,4 @@
-name: "3DTopia__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-0_h_v_8_v_8_none_lora_dmd_v1_eik1"
+name: "3DTopia__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-0_h_v_8_v_8_none_lora_dmd_v1_iters_2w"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_10"
 seed: 0
@@ -83,7 +83,7 @@ system:
     rotate_planes: v2
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-      training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16" 
+      training_type: "self_lora_rank_8-cross_lora_rank_8-locon_rank_8" 
       timestep: 999
       output_dim: 32
       # gradient_checkpoint: true
@@ -117,7 +117,7 @@ system:
     isosurface_remove_outliers: false
     isosurface_method: "diffmc"
     enable_bg_rays: true
-    sdf_grad_shrink: 0. #[0, 0.1, 1., 30000]
+    sdf_grad_shrink: 0. #[0, 0.1, 1., 20000]
     allow_empty_flag: false
 
 
@@ -139,8 +139,8 @@ system:
 
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
-    min_step_percent: [0, 0.5, 0.02, 30000]
-    max_step_percent: [0, 0.98, 0.5, 30000]
+    min_step_percent: [0, 0.5, 0.02, 20000]
+    max_step_percent: [0, 0.98, 0.5, 20000]
 
     # the following are specific to MV
     mv_model_name_or_path: "sd-v2.1-base-4view"
@@ -164,7 +164,7 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: [0, 0.1, 1., 30000]
+    sd_weight: [0, 0.1, 1., 20000]
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd"
 
@@ -231,7 +231,7 @@ trainer:
   max_steps: 500000
   log_every_n_steps: 1
   num_sanity_val_steps: 0
-  val_check_interval: 10000
+  val_check_interval: 5000
   # check_val_every_n_epoch: 50
   enable_progress_bar: true
   precision: 32
