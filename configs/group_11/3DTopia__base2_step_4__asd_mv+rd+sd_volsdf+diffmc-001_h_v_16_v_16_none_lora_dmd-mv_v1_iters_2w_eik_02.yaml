@@ -156,7 +156,7 @@ system:
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "dmd-mv"
+    rd_weighting_strategy: "dmd_mv"
     # cam_method: "rel_x2" # "rel_x2", "rel" or "abs"
 
     rd_use_sds: false
@@ -166,7 +166,7 @@ system:
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
-    sd_weighting_strategy: "dmd-mv"
+    sd_weighting_strategy: "dmd_mv"
 
     # the following are specific to ASD
     plus_schedule: "linear"
