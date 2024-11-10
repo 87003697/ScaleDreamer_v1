@@ -1,6 +1,6 @@
 name: "3DTopia__base2_step_4__asd_mv+rd+sd_volsdf+diffmc-001_h_v_16_v_16_none_lora_dmd_v1_iters_2w_eik_02"
 tag: "${rmspace:${data.prompt_library},_}"
-exp_root_dir: "outputs_10"
+exp_root_dir: "outputs_11"
 seed: 0
 
 data_type: "multiview-multiprompt-dualrenderer-multistep-datamodule-v2"
