@@ -164,7 +164,7 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: [0., 30000, 1., 40000]
+    sd_weight: [30000, 0., 1., 40000]
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd_mv"
 
