@@ -139,8 +139,8 @@ system:
 
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
-    min_step_percent: [30000, 0.5, 0.02, 40000]
-    max_step_percent: [30000, 0.98, 0.5, 40000]
+    min_step_percent: 0.02
+    max_step_percent: 0.5
 
     # the following are specific to MV
     mv_model_name_or_path: "sd-v2.1-base-4view"
