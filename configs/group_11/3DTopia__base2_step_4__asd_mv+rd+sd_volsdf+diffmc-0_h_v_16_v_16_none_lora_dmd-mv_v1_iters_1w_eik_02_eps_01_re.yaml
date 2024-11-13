@@ -147,7 +147,7 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 3.
     mv_guidance_scale: 7.5 #7.5
-    mv_weighting_strategy: "dmd_mv"
+    mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
     rd_min_step_percent: 0.5
@@ -164,7 +164,7 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: [30000, 0., 1., 40000]
+    sd_weight: 0.
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd_mv"
 
