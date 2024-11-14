@@ -184,7 +184,7 @@ system:
     gradient_checkpoint: true
     auto_grad: true
 
-    eps: 1
+    eps: 0.1
 
 
 
