@@ -200,7 +200,7 @@ system:
     lambda_asd: 1.
     lambda_orient: 0.
     lambda_sparsity: 0
-    lambda_opaque: 0 
+    lambda_opaque: 10
     lambda_z_variance: 0.
     lambda_eikonal: 0.
     lambda_normal_consistency: 0.
