@@ -61,7 +61,7 @@ system:
   parallel_guidance: true
 
   gradient_accumulation_steps: 6 # to replace the accumulate_grad_batches because it is not supported in our method
-  
+
   # multi-step trianing / inference
   num_parts_training: 4 # TBD
   num_steps_training: 4 # TBD
@@ -184,7 +184,7 @@ system:
     gradient_checkpoint: true
     auto_grad: true
 
-    # eps: 0.1
+    eps: 0.1
 
 
 
