@@ -119,7 +119,7 @@ system:
     isosurface_remove_outliers: false
     isosurface_method: "diffmc"
     enable_bg_rays: true
-    sdf_grad_shrink: 0. #[0, 0.1, 1., 20000]
+    sdf_grad_shrink: 0.01 #[0, 0.1, 1., 20000]
     allow_empty_flag: false
 
 
@@ -166,7 +166,7 @@ system:
 
     # the following are specific to SD
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
-    sd_weight: 0.
+    sd_weight: 1.
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd"
 
