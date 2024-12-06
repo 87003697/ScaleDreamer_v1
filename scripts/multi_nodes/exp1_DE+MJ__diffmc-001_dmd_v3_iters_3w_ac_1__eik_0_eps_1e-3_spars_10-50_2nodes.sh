@@ -15,5 +15,5 @@ torchrun \
         --train \
         --gpu 0,1,2,3,4,5,6,7 \
         data.prompt_library="DALLE_Midjourney_1313928_prompt_library" \
-        data.condition_processor.cache_dir="/dfs/ai-storage/ai-prod/platform/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" \
-        data.guidance_processor.cache_dir="/dfs/ai-storage/ai-prod/platform/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" 
+        data.condition_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" \
+        data.guidance_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" 
