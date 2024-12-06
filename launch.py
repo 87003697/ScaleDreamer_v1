@@ -116,7 +116,12 @@ def main(args, extras) -> None:
     print("All GPUs:", env_gpus)
     from threestudio.utils.misc import get_rank
     import torch
-    print("Current rank:", get_rank() % torch.cuda.device_count())
+    # print("Current rank:", get_rank() % torch.cuda.device_count())
+    rank_keys = ("RANK", "LOCAL_RANK", "SLURM_PROCID", "JSM_NAMESPACE_RANK")
+    for key in rank_keys:
+        rank = os.environ.get(key)
+        if rank is not None:
+            print(f"Rank key: {key}, rank: {rank}")
 
     # Always rely on CUDA_VISIBLE_DEVICES if specific GPU ID(s) are specified.
     # As far as Pytorch Lightning is concerned, we always use all available GPUs
