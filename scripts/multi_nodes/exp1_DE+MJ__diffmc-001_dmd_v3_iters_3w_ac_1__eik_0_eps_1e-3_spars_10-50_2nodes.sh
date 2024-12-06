@@ -2,7 +2,7 @@
 NUM_TRAINERS=8
 HOST_NODE_ADDR=10.21.21.181
 
-
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 torchrun \
     --nnodes=$2 \
     --nproc-per-node=$NUM_TRAINERS \
