@@ -15,8 +15,8 @@ gpus=$(seq -s, 0 $((total_gpus - 1)))
 # Export the CUDA_VISIBLE_DEVICES environment variable
 export CUDA_VISIBLE_DEVICES=$gpus
 
-# count the number of GPUs given the nnodes and nproc-per-node
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+# # count the number of GPUs given the nnodes and nproc-per-node
+# export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 torchrun \
     --nnodes=$num_nodes \
     --nproc-per-node=$NUM_TRAINERS \
