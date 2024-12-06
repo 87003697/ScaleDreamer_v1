@@ -10,7 +10,7 @@ nproc_per_node=8
 total_gpus=$((num_nodes * nproc_per_node))
 
 # Export the CUDA_VISIBLE_DEVICES environment variable
-export CUDA_VISIBLE_DEVICES=$(seq -s, 0 $((total_gpus)))
+export CUDA_VISIBLE_DEVICES=$(seq -s, 0 $((total_gpus - 1)))
 
 # # count the number of GPUs given the nnodes and nproc-per-node
 # export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
