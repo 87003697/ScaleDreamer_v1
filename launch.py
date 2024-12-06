@@ -113,20 +113,6 @@ def main(args, extras) -> None:
     env_gpus = list(env_gpus_str.split(",")) if env_gpus_str else []
     selected_gpus = [0]
 
-    print("All GPUs:", env_gpus)
-    from threestudio.utils.misc import get_rank
-    import torch
-    print("Current rank:", get_rank())
-    # print("Current rank:", get_rank() % torch.cuda.device_count())
-    # rank_keys = ("RANK", "LOCAL_RANK", "SLURM_PROCID", "JSM_NAMESPACE_RANK")
-    # for key in rank_keys:
-    #     rank = os.environ.get(key)
-    #     if rank is not None:
-    #         print(f"Rank key: {key}, rank: {rank}")
-
-    # Always rely on CUDA_VISIBLE_DEVICES if specific GPU ID(s) are specified.
-    # As far as Pytorch Lightning is concerned, we always use all available GPUs
-    # (possibly filtered by CUDA_VISIBLE_DEVICES).
     devices = -1
     if len(env_gpus) > 0:
         # CUDA_VISIBLE_DEVICES was set already, e.g. within SLURM srun or higher-level script.
@@ -179,7 +165,7 @@ def main(args, extras) -> None:
     cfg = load_config(args.config, cli_args=extras, n_gpus=n_gpus)
 
     # set a different seed for each device
-    pl.seed_everything(cfg.seed + get_rank(), workers=True)
+    pl.seed_everything(cfg.seed + get_rank(opposite=True), workers=True)
 
     dm = threestudio.find(cfg.data_type)(cfg.data)
     system: BaseSystem = threestudio.find(cfg.system_type)(
