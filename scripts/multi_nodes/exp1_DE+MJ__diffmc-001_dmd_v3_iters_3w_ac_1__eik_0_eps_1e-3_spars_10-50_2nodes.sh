@@ -1,21 +1,14 @@
 
-NUM_NODES=2
 NUM_TRAINERS=8
 HOST_NODE_ADDR=10.21.21.181
 
-if [ -z "$1" ]; then
-  echo "error: missing JOB_ID"
-  exit 1
-fi
-JOB_ID=$1
 
 torchrun
-    --nnodes=$NUM_NODES
+    --nnodes=$1
     --nproc-per-node=$NUM_TRAINERS
     --max-restarts=3
-    --rdzv-id=$JOB_ID
-    --rdzv-backend=c10d
-    --rdzv-endpoint=$HOST_NODE_ADDR
+    --node_rank=$2
+    --master_port=12345
     python launch.py \
         --config configs/group_13/DE+MJ__diffmc-001_dmd_v3_iters_3w_ac_1__eik_0_eps_1e-3_spars_10-50.yaml \
         --train \
