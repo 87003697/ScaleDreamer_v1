@@ -115,6 +115,7 @@ def main(args, extras) -> None:
 
     print("All GPUs:", env_gpus)
     from threestudio.utils.misc import get_rank
+    import torch
     print("Current rank:", get_rank() % torch.cuda.device_count())
 
     # Always rely on CUDA_VISIBLE_DEVICES if specific GPU ID(s) are specified.
