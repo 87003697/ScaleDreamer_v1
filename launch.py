@@ -113,6 +113,8 @@ def main(args, extras) -> None:
     env_gpus = list(env_gpus_str.split(",")) if env_gpus_str else []
     selected_gpus = [0]
 
+    print("All GPUs:", env_gpus)
+    
     # Always rely on CUDA_VISIBLE_DEVICES if specific GPU ID(s) are specified.
     # As far as Pytorch Lightning is concerned, we always use all available GPUs
     # (possibly filtered by CUDA_VISIBLE_DEVICES).
