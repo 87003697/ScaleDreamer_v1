@@ -6,7 +6,7 @@ HOST_NODE_ADDR=10.21.21.181
 torchrun \
     --nnodes=$2 \
     --nproc-per-node=$NUM_TRAINERS \
-    --max-restarts=3 \
+    --max-restarts=1 \
     --node_rank=$3 \
     --master_port=$1 \
     --master_addr=$HOST_NODE_ADDR \
