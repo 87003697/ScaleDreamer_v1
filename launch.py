@@ -121,6 +121,8 @@ def main(args, extras) -> None:
         selected_gpus = list(args.gpu.split(","))
         n_gpus = len(selected_gpus)
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+    
+    print("CUDA_VISIBLE_DEVICES:", os.environ["CUDA_VISIBLE_DEVICES"])
 
     import pytorch_lightning as pl
     import torch
