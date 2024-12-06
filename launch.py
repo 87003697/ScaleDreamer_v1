@@ -114,7 +114,9 @@ def main(args, extras) -> None:
     selected_gpus = [0]
 
     print("All GPUs:", env_gpus)
-    
+    from threestudio.utils.misc import get_rank
+    print("Current rank:", get_rank())
+
     # Always rely on CUDA_VISIBLE_DEVICES if specific GPU ID(s) are specified.
     # As far as Pytorch Lightning is concerned, we always use all available GPUs
     # (possibly filtered by CUDA_VISIBLE_DEVICES).
