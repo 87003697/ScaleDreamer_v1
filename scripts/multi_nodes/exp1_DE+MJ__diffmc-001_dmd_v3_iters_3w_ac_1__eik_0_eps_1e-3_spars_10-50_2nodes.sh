@@ -1,7 +1,7 @@
 
 NUM_NODES=2
 NUM_TRAINERS=8
-HOST_NODE_ADDR=10.21.21.180
+HOST_NODE_ADDR=10.21.21.181
 
 if [ -z "$1" ]; then
   echo "error: missing JOB_ID"
