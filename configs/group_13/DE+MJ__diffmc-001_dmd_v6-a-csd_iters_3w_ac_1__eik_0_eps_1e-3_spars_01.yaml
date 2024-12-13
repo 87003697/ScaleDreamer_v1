@@ -1,4 +1,4 @@
-name: "DE+MJ__diffmc-001_dmd_v6-csd_iters_3w_ac_1__eik_0_eps_1e-3_spars_01"
+name: "DE+MJ__diffmc-001_dmd_v6-a-csd_iters_3w_ac_1__eik_0_eps_1e-3_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_13"
 seed: 0
@@ -161,7 +161,7 @@ system:
     rd_weight: 3.
     rd_guidance_scale: 7.5
     rd_weighting_strategy: "dmd_mv"
-    cam_method: "rel_x2" # "rel_x2", "rel" or ""
+    cam_method: "abs" # "rel_x2", "rel" or ""
 
     rd_use_sds: false
 
