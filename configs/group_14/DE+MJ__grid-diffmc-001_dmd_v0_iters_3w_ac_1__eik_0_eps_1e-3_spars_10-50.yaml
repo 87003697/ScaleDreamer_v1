@@ -152,9 +152,9 @@ system:
 
     num_samples_per_ray: 128
     
-    grid_resolution: 128
+    grid_resolution: 32
     near_plane: 0.1
-    far_plane: 4.0
+    far_plane: 10 # strage but a large value really helps
     train_chunk_size: 0 #100000
 
 
@@ -239,7 +239,7 @@ system:
     lambda_sparsity_2nd: [0, 10., 50., 30000]
     lambda_opaque_2nd: 0. 
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 0.
+    lambda_eikonal_2nd: 1.
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. 

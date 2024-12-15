@@ -139,7 +139,7 @@ system:
     
     grid_resolution: 128
     near_plane: 0.1
-    far_plane: 4.0
+    far_plane: 10 # strage but a large value really helps
     train_chunk_size: 0 #100000
     
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
