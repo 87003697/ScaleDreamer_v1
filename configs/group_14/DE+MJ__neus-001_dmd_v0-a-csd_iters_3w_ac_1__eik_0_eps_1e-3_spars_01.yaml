@@ -1,4 +1,4 @@
-name: "DE+MJ__grid-001_dmd_v0-csd--_iters_3w_ac_1__eik_0_eps_1e-3_spars_01"
+name: "DE+MJ__neus-001_dmd_v0-a-csd_iters_3w_ac_1__eik_0_eps_1e-3_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_14"
 seed: 0
@@ -11,8 +11,8 @@ data:
   # this drastically reduces VRAM usage as empty space is pruned in early training
   width: 512
   height: 512 # so high resolution !!
-  ray_height: 128
-  ray_width: 128
+  ray_height: 64
+  ray_width: 64
   # unsupervised data
   prompt_library: ???
   unsup_elevation_range: [0, 30]
@@ -123,25 +123,21 @@ system:
     allow_empty_flag: false
 
 
-  renderer_2nd_type: generative-space-occ-neus-renderer
+  renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
     radius: ${system.geometry.radius}
     use_volsdf: false
     trainable_variance: false # important!
-    learned_variance_init: 0.5298
-    # 0.3401 = log(30) / 10
-    # 0.3689 = log(40) / 10
-    # 0.3912 = log(50) / 10
-    # 0.5010 = log(150) / 10
-    # 0.5298 = log(200) / 10
+    learned_variance_init: 0.5298  # 0.5298 = log(200) / 10, 200 is the most common variance across the prompts
 
-    num_samples_per_ray: 128
-    
-    grid_resolution: 128
+    estimator: importance
+    num_samples_per_ray: 64
+      num_samples_per_ray_importance: 64 
+
     near_plane: 0.1
-    far_plane: 10 # strage but a large value really helps
+    far_plane: 4.0
     train_chunk_size: 0 #100000
-    
+
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
     # min_step_percent: [0, 0.5, 0.02, 30000]
@@ -149,7 +145,7 @@ system:
 
     # the following are specific to MV
     mv_min_step_percent: [0, 0.5, 0.02, 30000]
-    mv_max_step_percent: 0.98
+    mv_max_step_percent: [0, 0.98, 0.5, 30000]
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 3.
@@ -158,19 +154,19 @@ system:
 
     # the following are specific to RD
     rd_min_step_percent: [0, 0.5, 0.02, 30000]
-    rd_max_step_percent: 0.98
+    rd_max_step_percent: [0, 0.98, 0.5, 30000]
     rd_model_name_or_path: "nd-mv"
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
     rd_weighting_strategy: "dmd_mv"
-    cam_method: "rel_x2" # "rel_x2", "rel" or ""
+    cam_method: "abs" # "rel_x2", "rel" or ""
 
     rd_use_sds: false
 
     # the following are specific to SD
     sd_min_step_percent: [0, 0.5, 0.02, 30000]
-    sd_max_step_percent: 0.98
+    sd_max_step_percent: [0, 0.98, 0.5, 30000]
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
@@ -182,11 +178,11 @@ system:
     plus_schedule: "linear"
     # the following are specific to the combination of ASD with MV and SD
     mv_plus_random: true
-    mv_plus_ratio: 0.1
+    mv_plus_ratio: 0.
     rd_plus_random: true
-    rd_plus_ratio: 0.1
+    rd_plus_ratio: 0.
     sd_plus_random: true
-    sd_plus_ratio: 0.1
+    sd_plus_ratio: 0.
 
     # try to save memory cost
     gradient_checkpoint: true

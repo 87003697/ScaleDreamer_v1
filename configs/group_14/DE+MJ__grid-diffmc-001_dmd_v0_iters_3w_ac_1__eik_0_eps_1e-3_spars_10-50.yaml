@@ -123,10 +123,35 @@ system:
     allow_empty_flag: false
 
 
+  renderer_2nd_type: patch-renderer
+  renderer_2nd:
+    base_renderer_type: generative-space-volsdf-volume-renderer
+    base_renderer:
+      radius: ${system.geometry.radius}
+      use_volsdf: false
+      trainable_variance: false # important!
+      learned_variance_init: 0.5298  # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
+
+      estimator: importance
+      num_samples_per_ray: 64
+      num_samples_per_ray_importance: 128 # not used
+
+      near_plane: 0.1
+      far_plane: 4.0
+      train_chunk_size: 0 #100000
+    patch_size: 64
+    global_downsample: 2
+
+    # 0.3401 = log(30) / 10
+    # 0.3689 = log(40) / 10
+    # 0.3912 = log(50) / 10
+    # 0.5010 = log(150) / 10
+    # 0.5298 = log(200) / 10
+
   # renderer_2nd_type: generative-space-volsdf-volume-renderer
   # renderer_2nd:
   #   radius: ${system.geometry.radius}
-  #   use_volsdf: true
+  #   use_volsdf: false
   #   trainable_variance: false # important!
   #   learned_variance_init: 0.3401 # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
 
@@ -138,24 +163,22 @@ system:
   #   far_plane: 4.0
   #   train_chunk_size: 0 #100000
 
-  renderer_2nd_type: generative-space-occ-neus-renderer
-  renderer_2nd:
-    radius: ${system.geometry.radius}
-    use_volsdf: false
-    trainable_variance: false # important!
-    learned_variance_init: 0.5298
-    # 0.3401 = log(30) / 10
-    # 0.3689 = log(40) / 10
-    # 0.3912 = log(50) / 10
-    # 0.5010 = log(150) / 10
-    # 0.5298 = log(200) / 10
 
-    num_samples_per_ray: 128
+
+  # renderer_2nd_type: generative-space-occ-neus-renderer
+  # renderer_2nd:
+  #   radius: ${system.geometry.radius}
+  #   use_volsdf: true
+  #   trainable_variance: false # important!
+  #   learned_variance_init: 0.5298
+
+
+  #   num_samples_per_ray: 128
     
-    grid_resolution: 32
-    near_plane: 0.1
-    far_plane: 10 # strage but a large value really helps
-    train_chunk_size: 0 #100000
+  #   grid_resolution: 32
+  #   near_plane: 0.1
+  #   far_plane: 10 # strage but a large value really helps
+  #   train_chunk_size: 0 #100000
 
 
 
@@ -172,7 +195,7 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 3.
     mv_guidance_scale: 7.5 #7.5
-    mv_weighting_strategy: "dmd_mv"
+    mv_weighting_strategy: "dmd_mv+1"
 
     # the following are specific to RD
     rd_min_step_percent: [0, 0.5, 0.02, 30000]
@@ -181,7 +204,7 @@ system:
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "dmd_mv"
+    rd_weighting_strategy: "dmd_mv+1"
     cam_method: "rel_x2" # "rel_x2", "rel" or ""
 
     rd_use_sds: false
@@ -192,7 +215,7 @@ system:
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
-    sd_weighting_strategy: "dmd_mv"
+    sd_weighting_strategy: "dmd_mv+1"
     sd_hq_only: true
 
 

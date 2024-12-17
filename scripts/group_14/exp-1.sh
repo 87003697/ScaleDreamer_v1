@@ -18,5 +18,5 @@ CUDA_VISIBLE_DEVICES=0 python launch.py \
     --train \
     data.prompt_library="dreamfusion_415_prompt_library" \
     trainer.val_check_interval=10 \
-    data.batch_size=8
+    data.batch_size=4
       
