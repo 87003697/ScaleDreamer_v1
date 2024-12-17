@@ -175,7 +175,7 @@ system:
     sd_weight: 1
     sd_guidance_scale: 7.5
     sd_weighting_strategy: "dmd_mv"
-    # sd_hq_only: true
+    sd_hq_only: true
 
 
     # the following are specific to ASD
