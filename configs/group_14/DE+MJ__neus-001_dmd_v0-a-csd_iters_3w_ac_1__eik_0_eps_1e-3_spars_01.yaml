@@ -132,7 +132,7 @@ system:
 
     estimator: importance
     num_samples_per_ray: 64
-      num_samples_per_ray_importance: 64 
+    num_samples_per_ray_importance: 64 
 
     near_plane: 0.1
     far_plane: 4.0
