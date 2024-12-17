@@ -78,12 +78,12 @@ class NeuSVolumeRenderer(VolumeRenderer):
             if not self.cfg.grid_prune:
                 self.estimator.occs.fill_(True)
                 self.estimator.binaries.fill_(True)
-            self.render_step_size = (
-                1.732 * 2 * self.cfg.radius / self.cfg.num_samples_per_ray
-            )
             self.randomized = self.cfg.randomized
         elif self.cfg.estimator == "importance":
             self.estimator = ImportanceEstimator()
+            self.render_step_size = (
+                1.732 * 2 * self.cfg.radius / self.cfg.num_samples_per_ray
+            )
         else:
             raise NotImplementedError(
                 "unknown estimator, should be in ['occgrid', 'importance']"
@@ -199,27 +199,56 @@ class NeuSVolumeRenderer(VolumeRenderer):
                 t_ends: Float[Tensor, "Nr Ns"],
                 proposal_network,
             ):
-                if self.cfg.use_volsdf:
-                    t_origins: Float[Tensor, "Nr 1 3"] = rays_o_flatten.unsqueeze(-2)
-                    t_dirs: Float[Tensor, "Nr 1 3"] = rays_d_flatten.unsqueeze(-2)
-                    positions: Float[Tensor, "Nr Ns 3"] = (
-                        t_origins + t_dirs * (t_starts + t_ends)[..., None] / 2.0
-                    )
-                    with torch.no_grad():
-                        geo_out = chunk_batch(
-                            proposal_network,
-                            self.cfg.eval_chunk_size,
-                            positions.reshape(-1, 3),
-                            output_normal=False,
-                        )
-                        inv_std = self.variance(geo_out["sdf"])
-                        density = volsdf_density(geo_out["sdf"], inv_std)
-                    return density.reshape(positions.shape[:2])
-                else:
-                    raise ValueError(
-                        "Currently only VolSDF supports importance sampling."
-                    )
+                # if self.cfg.use_volsdf:
+                #     t_origins: Float[Tensor, "Nr 1 3"] = rays_o_flatten.unsqueeze(-2)
+                #     t_dirs: Float[Tensor, "Nr 1 3"] = rays_d_flatten.unsqueeze(-2)
+                #     positions: Float[Tensor, "Nr Ns 3"] = (
+                #         t_origins + t_dirs * (t_starts + t_ends)[..., None] / 2.0
+                #     )
+                #     with torch.no_grad():
+                #         geo_out = chunk_batch(
+                #             proposal_network,
+                #             self.cfg.eval_chunk_size,
+                #             positions.reshape(-1, 3),
+                #             output_normal=False,
+                #         )
+                #         inv_std = self.variance(geo_out["sdf"])
+                #         density = volsdf_density(geo_out["sdf"], inv_std)
+                #     return density.reshape(positions.shape[:2])
+                # else:
+                #     raise ValueError(
+                #         "Currently only VolSDF supports importance sampling."
+                #     )
 
+                t_origins: Float[Tensor, "Nr 1 3"] = rays_o_flatten.unsqueeze(-2)
+                t_dirs: Float[Tensor, "Nr 1 3"] = rays_d_flatten.unsqueeze(-2)
+                positions: Float[Tensor, "Nr Ns 3"] = (
+                    t_origins + t_dirs * (t_starts + t_ends)[..., None] / 2.0
+                )
+                with torch.no_grad():
+                    geo_out = chunk_batch(
+                        proposal_network,
+                        self.cfg.eval_chunk_size,
+                        positions.reshape(-1, 3),
+                        output_normal=False,
+                    )
+                
+                    inv_std = self.variance(geo_out["sdf"])
+                    if self.cfg.use_volsdf:
+                        density = volsdf_density(geo_out["sdf"], inv_std)
+                        return density.reshape(positions.shape[:2])
+                    else:
+                        sdf = geo_out["sdf"]
+                        estimated_next_sdf = sdf - self.render_step_size * 0.5
+                        estimated_prev_sdf = sdf + self.render_step_size * 0.5
+                        prev_cdf = torch.sigmoid(estimated_prev_sdf * inv_std)
+                        next_cdf = torch.sigmoid(estimated_next_sdf * inv_std)
+                        p = prev_cdf - next_cdf
+                        c = prev_cdf
+                        alpha = ((p + 1e-5) / (c + 1e-5)).clip(0.0, 1.0)
+                        density = alpha / self.render_step_size
+                        return density.reshape(positions.shape[:2])
+                
             t_starts_, t_ends_ = self.estimator.sampling(
                 prop_sigma_fns=[partial(prop_sigma_fn, proposal_network=self.geometry)],
                 prop_samples=[self.cfg.num_samples_per_ray_importance],
