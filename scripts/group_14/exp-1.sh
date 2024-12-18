@@ -13,7 +13,7 @@
 #     data.guidance_processor.cache_dir=".threestudio_cache/text_embeddings_DALLE_Midjourney" 
 
 
-CUDA_VISIBLE_DEVICES=0 python launch.py \
+CUDA_VISIBLE_DEVICES=3 python launch.py \
     --config configs/group_14/DE+MJ__grid-diffmc-001_dmd_v0_iters_3w_ac_1__eik_0_eps_1e-3_spars_10-50.yaml \
     --train \
     data.prompt_library="dreamfusion_415_prompt_library" \
