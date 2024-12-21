@@ -150,7 +150,7 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 3.
     mv_guidance_scale: 7.5 #7.5
-    mv_weighting_strategy: "dmd-mv+1"
+    mv_weighting_strategy: "dmd_mv+1"
 
     # the following are specific to RD
     rd_min_step_percent: [0, 0.5, 0.02, 30000]
@@ -159,7 +159,7 @@ system:
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 3.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "dmd-mv+1"
+    rd_weighting_strategy: "dmd_mv+1"
     cam_method: "rel_x2" # "", "rel" or ""
 
     rd_use_sds: false
@@ -170,7 +170,7 @@ system:
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
-    sd_weighting_strategy: "dmd-mv+1"
+    sd_weighting_strategy: "dmd_mv+1"
     # sd_hq_only: true
     sd_oppo_side: true
 
