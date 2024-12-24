@@ -172,7 +172,7 @@ system:
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
-    sd_weighting_strategy: "dmd"
+    sd_weighting_strategy: "dmd1"
     # sd_hq_only: true
     sd_oppo_side: true
 
