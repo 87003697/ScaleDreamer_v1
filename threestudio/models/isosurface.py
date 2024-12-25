@@ -17,9 +17,15 @@ class IsosurfaceHelper(nn.Module):
 
 # added by Zhiyuan ########################################
 class DiffMarchingCubeHelper(IsosurfaceHelper):
-    def __init__(self, resolution: int) -> None:
+    def __init__(
+            self, 
+            resolution: int, 
+            point_range: Tuple[float, float] = (0, 1)
+        ) -> None:
         super().__init__()
         self.resolution = resolution
+        self.points_range = point_range
+
         from diso import DiffMC
         self.mc_func: Callable = DiffMC(dtype=torch.float32)
         self._grid_vertices: Optional[Float[Tensor, "N3 3"]] = None
@@ -33,9 +39,9 @@ class DiffMarchingCubeHelper(IsosurfaceHelper):
         if self._grid_vertices is None:
             # keep the vertices on CPU so that we can support very large resolution
             x, y, z = (
-                torch.linspace(0, 1, self.resolution),
-                torch.linspace(0, 1, self.resolution),
-                torch.linspace(0, 1, self.resolution),
+                torch.linspace(*self.points_range, self.resolution),
+                torch.linspace(*self.points_range, self.resolution),
+                torch.linspace(*self.points_range, self.resolution),
             )
             x, y, z = torch.meshgrid(x, y, z, indexing="ij")
             verts = torch.stack([x, y, z], dim=-1).reshape(-1, 3)
@@ -63,9 +69,14 @@ class DiffMarchingCubeHelper(IsosurfaceHelper):
 ##############################################
 
 class MarchingCubeCPUHelper(IsosurfaceHelper):
-    def __init__(self, resolution: int) -> None:
+    def __init__(
+            self, 
+            resolution: int,
+            point_range: Tuple[float, float] = (0, 1)
+        ) -> None:
         super().__init__()
         self.resolution = resolution
+        self.points_range = point_range
         import mcubes
 
         self.mc_func: Callable = mcubes.marching_cubes
@@ -113,10 +124,16 @@ class MarchingCubeCPUHelper(IsosurfaceHelper):
 
 
 class MarchingTetrahedraHelper(IsosurfaceHelper):
-    def __init__(self, resolution: int, tets_path: str):
+    def __init__(
+            self, 
+            resolution: int, 
+            tets_path: str,
+            point_range: Tuple[float, float] = (0, 1)
+        ):
         super().__init__()
         self.resolution = resolution
         self.tets_path = tets_path
+        self.points_range = point_range
 
         self.triangle_table: Float[Tensor, "..."]
         self.register_buffer(
