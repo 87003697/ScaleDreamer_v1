@@ -22,7 +22,6 @@ data:
   n_val_views: 30
   eval_height: 64
   eval_width: 64
-  relative_radius: false
 
 system_type: "scaledreamer-system"
 system:
