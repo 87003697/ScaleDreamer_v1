@@ -1,4 +1,4 @@
-name: "DE+MJ__dmd_v0-v66+1__ro-v1_sp-NA__iters_2w_ac_1__eik_0_eps_1e-3_spars_01"
+name: "DE+MJ__dmd_v0-v67+1__ro-v1_sp-NA__iters_2w_ac_1__eik_0_eps_1e-3_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_15"
 seed: 0
@@ -17,7 +17,7 @@ data:
   prompt_library: ???
   unsup_elevation_range: [0, 30]
   unsup_camera_distance_range: [0.8, 1.0] # relative
-  unsup_fovy_range: [60, 60]
+  unsup_fovy_range: [60, 70]
   relative_radius: true
   eval_camera_distance: 3.0
   eval_fovy_deg: 40.
