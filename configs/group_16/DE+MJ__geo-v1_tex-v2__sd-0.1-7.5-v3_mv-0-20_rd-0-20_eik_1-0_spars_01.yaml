@@ -1,4 +1,4 @@
-name: "DE+MJ__geo-v1_tex-v1__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_1-0_spars_01"
+name: "DE+MJ__geo-v1_tex-v2__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_1-0_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_16"
 seed: 0
@@ -86,7 +86,7 @@ system:
     split_channels: v1 # v1: split channels for geometry and texture triplanes
 
     geo_interpolate: v1
-    tex_interpolate: v1
+    tex_interpolate: v2
 
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
@@ -221,7 +221,7 @@ system:
 
     lambda_asd_2nd: 1.
     lambda_orient_2nd: 0.
-    lambda_sparsity_2nd: 10. #[0, 10., 50., 20000]
+    lambda_sparsity_2nd: 0.1 #[0, 10., 50., 20000]
     lambda_opaque_2nd: 0. 
     lambda_z_variance_2nd: 0.
     lambda_eikonal_2nd: [0, 1., 0., 20000]

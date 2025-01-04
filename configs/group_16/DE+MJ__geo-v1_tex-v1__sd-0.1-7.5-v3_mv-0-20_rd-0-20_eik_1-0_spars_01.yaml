@@ -1,4 +1,4 @@
-name: "DE+MJ__geo-v1_tex-v1__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_1-0_spars_01"
+name: "DE+MJ__geo-v1_tex-v1__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_1-0_spars_10"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_16"
 seed: 0
