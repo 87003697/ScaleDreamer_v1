@@ -1,4 +1,4 @@
-name: "DE+MJ__geo-v2_tex-v2__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_1-0_spars_01"
+name: "DE+MJ__geo-v2_tex-v2__sd-0.1-7.5-v3_mv-0-20_rd-0-20_eik_10-0_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_16"
 seed: 0
@@ -224,7 +224,7 @@ system:
     lambda_sparsity_2nd: 0.1 #[0, 10., 50., 20000]
     lambda_opaque_2nd: 0. 
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: [0, 1., 0., 20000]
+    lambda_eikonal_2nd: [0, 10., 0., 20000]
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. 
