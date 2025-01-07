@@ -175,7 +175,7 @@ system:
 
     # the following are specific to SD
     sd_min_step_percent: [0, 0.5, 0.02, 20000]
-    sd_max_step_percent: [0, 0.98, 0.5, 20000]
+    sd_max_step_percent: 0.98
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
