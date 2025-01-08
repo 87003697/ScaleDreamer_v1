@@ -1,4 +1,4 @@
-name: "DE+MJ__sdf-1-001_def=0-1-01_sd-0.1-7.5-v0_mv-0-20_rd-0-20_eik_1-0_spars_01"
+name: "DE+MJ__sdf-1-001_def=0-0-1_sd-0.1-7.5-v0_mv-0-20_rd-0-20_eik_1-0_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_17"
 seed: 0
@@ -127,7 +127,7 @@ system:
     allow_empty_flag: false
 
     sdf_grad_shrink: 0. #01 #[0, 0.1, 1., 20000]
-    def_grad_shrink: [0, 1, 0.1, 20000]
+    def_grad_shrink: [0, 0., 1., 20000]
 
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
