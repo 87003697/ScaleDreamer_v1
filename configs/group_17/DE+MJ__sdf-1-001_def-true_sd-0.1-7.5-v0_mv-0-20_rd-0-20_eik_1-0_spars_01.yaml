@@ -127,7 +127,7 @@ system:
     allow_empty_flag: false
 
     sdf_grad_shrink: 0.01 #[0, 0.1, 1., 20000]
-    allow_deformation_shrink: true
+    def_grad_shrink: 0.01
 
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer

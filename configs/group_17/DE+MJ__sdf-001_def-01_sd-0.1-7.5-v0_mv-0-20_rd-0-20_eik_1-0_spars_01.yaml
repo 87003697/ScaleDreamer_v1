@@ -1,4 +1,4 @@
-name: "DE+MJ__geo-v2_sdf-1-01_def-false_sd-0.1-7.5-v0_mv-0-20_rd-0-20_eik_1-0_spars_01"
+name: "DE+MJ__sdf-001_def-01_sd-0.1-7.5-v0_mv-0-20_rd-0-20_eik_1-0_spars_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_17"
 seed: 0
@@ -85,7 +85,7 @@ system:
     rotate_planes: v1
     split_channels: v1 # v1: split channels for geometry and texture triplanes
 
-    geo_interpolate: v2
+    geo_interpolate: v1
     tex_interpolate: v2
 
     space_generator_config:
@@ -127,7 +127,7 @@ system:
     allow_empty_flag: false
 
     sdf_grad_shrink: 0.01 #[0, 0.1, 1., 20000]
-    def_grad_shrink: 1
+    def_grad_shrink: 0.1
 
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
@@ -137,7 +137,7 @@ system:
     trainable_variance: false # important!
     learned_variance_init: 0.3401 # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
     
-    rgb_grad_shrink: [0, 1, 0.1, 20000]
+    rgb_grad_shrink: 0.01
     # randomized: false
 
     estimator: importance
