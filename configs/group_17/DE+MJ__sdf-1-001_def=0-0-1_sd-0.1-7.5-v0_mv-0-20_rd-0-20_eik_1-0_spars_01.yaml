@@ -127,7 +127,7 @@ system:
     allow_empty_flag: false
 
     sdf_grad_shrink: 0. #01 #[0, 0.1, 1., 20000]
-    def_grad_shrink: [0, 0., 1., 20000]
+    def_grad_shrink: [0, 0.0001, 1., 20000] # start from as small as 0
 
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
