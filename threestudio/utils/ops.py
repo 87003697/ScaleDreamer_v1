@@ -230,6 +230,73 @@ def get_ray_directions(
 
     return directions
 
+def get_ortho_rays(
+        origins: Float[Tensor, "... 3"],
+        directions: Float[Tensor, "... 3"],
+        c2w: Float[Tensor, "... 4 4"],
+        keepdim=False,
+        noise_scale=0.0,
+        normalize=True,
+    ) -> Tuple[Float[Tensor, "... 3"], Float[Tensor, "... 3"]]:
+    # Rotate ray directions from camera coordinate to the world coordinate
+    assert directions.shape[-1] == 3
+    assert origins.shape[-1] == 3
+
+    if directions.ndim == 2: # (N_rays, 3)
+        if c2w.ndim == 2:  # (4, 4)
+            c2w = c2w[None, :, :]
+        assert c2w.ndim == 3  # (N_rays, 4, 4) or (1, 4, 4)
+        rays_d = (directions[:, None, :] * c2w[:, :3, :3]).sum(-1)  # (N_rays, 3)
+        rays_o = (origins[:, None, :] * c2w[:, :3, :3]).sum(-1)  # (N_rays, 3)
+        rays_o = c2w[:, :3, 3].expand(rays_d.shape) + rays_o
+        # rays_o = torch.matmul(c2w[:, :3, :3], origins[:, :, None]).squeeze()  # (N_rays, 3)
+        # rays_o = c2w[:,:3,3].expand(rays_d.shape) + rays_o  
+    elif directions.ndim == 3:  # (H, W, 3)
+        assert c2w.ndim in [2, 3]
+        if c2w.ndim == 2:  # (4, 4)
+            # import pdb; pdb.set_trace()
+            rays_d = (directions[:, :, None, :] * c2w[None, None, :3, :3]).sum(
+                -1
+            )  # (H, W, 3)
+            rays_o = (origins[:, :, None, :] * c2w[None, None, :3, :3]).sum(
+                -1
+            )
+            rays_o = c2w[None, None, :3, 3].expand(rays_d.shape) + rays_o
+            # rays_o = torch.matmul(c2w[None, None, :3, :3], origins[:, :, :, None]).squeeze()  # (H, W, 3)
+            # rays_o = c2w[None, None,:3,3].expand(rays_d.shape) + rays_o  
+        elif c2w.ndim == 3:  # (B, 4, 4)
+            rays_d = (directions[None, :, :, None, :] * c2w[:, None, None, :3, :3]).sum(
+                -1
+            )  # (B, H, W, 3)
+            rays_o = (origins[None, :, :, None, :] * c2w[:, None, None, :3, :3]).sum(
+                -1
+            )
+            rays_o = c2w[:, None, None, :3, 3].expand(rays_d.shape) + rays_o
+            # rays_o = torch.matmul(c2w[:,None, None, :3, :3], origins[None, :, :, :, None]).squeeze()  # # (B, H, W, 3)
+            # rays_o = c2w[:,None, None, :3,3].expand(rays_d.shape) + rays_o  
+    elif directions.ndim == 4:  # (B, H, W, 3)
+        # import pdb; pdb.set_trace()
+        assert c2w.ndim == 3  # (B, 4, 4)
+        rays_d = (directions[:, :, :, None, :] * c2w[:, None, None, :3, :3]).sum(
+            -1
+        )  # (B, H, W, 3)
+        rays_o = (origins[:, :, :, None, :] * c2w[:, None, None, :3, :3]).sum(
+            -1
+        )
+        rays_o = c2w[:, None, None, :3, 3].expand(rays_d.shape) + rays_o
+
+    # add camera noise to avoid grid-like artifect
+    # https://github.com/ashawkey/stable-dreamfusion/blob/49c3d4fa01d68a4f027755acf94e1ff6020458cc/nerf/utils.py#L373
+    if noise_scale > 0:
+        rays_o = rays_o + torch.randn(3, device=rays_o.device) * noise_scale
+        rays_d = rays_d + torch.randn(3, device=rays_d.device) * noise_scale
+
+    if normalize:
+        rays_d = F.normalize(rays_d, dim=-1)
+    if not keepdim:
+        rays_o, rays_d = rays_o.reshape(-1, 3), rays_d.reshape(-1, 3)
+
+    return rays_o, rays_d
 
 def get_rays(
     directions: Float[Tensor, "... 3"],
@@ -293,6 +360,22 @@ def get_projection_matrix(
     proj_mtx[:, 2, 3] = -2.0 * far * near / (far - near)
     proj_mtx[:, 3, 2] = -1.0
     return proj_mtx
+
+def get_ortho_projection_matrix(
+        left: float, right: float, bottom: float, top: float, near: float, far: float
+) -> Float[Tensor, "4 4"]:
+    projection_matrix = torch.zeros(4, 4, dtype=torch.float32)
+
+    projection_matrix[0, 0] = 2.0 / (right - left)
+    projection_matrix[1, 1] = -2.0 / (top - bottom) # add a negative sign here as the y axis is flipped in nvdiffrast output
+    projection_matrix[2, 2] = -2.0 / (far - near)
+
+    projection_matrix[0, 3] = -(right + left) / (right - left)
+    projection_matrix[1, 3] = -(top + bottom) / (top - bottom)
+    projection_matrix[2, 3] = -(far + near) / (far - near)
+    projection_matrix[3, 3] = 1.0
+
+    return projection_matrix
 
 
 def get_mvp_matrix(
