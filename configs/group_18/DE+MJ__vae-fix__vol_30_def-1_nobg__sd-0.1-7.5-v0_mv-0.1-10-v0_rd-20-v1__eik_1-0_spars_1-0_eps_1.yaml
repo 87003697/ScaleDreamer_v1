@@ -186,9 +186,9 @@ system:
     plus_schedule: "linear"
     # the following are specific to the combination of ASD with MV and SD
     mv_plus_random: true
-    mv_plus_ratio: 0.
+    mv_plus_ratio: 0.1
     rd_plus_random: true
-    rd_plus_ratio: 0.1
+    rd_plus_ratio: 0.
     sd_plus_random: true
     sd_plus_ratio: 0.1
 
