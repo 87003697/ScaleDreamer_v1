@@ -1,4 +1,4 @@
-name: "DE+MJ__vae-fix__ns_100_def=0-1_nobg__sd-0.1-7.5-v0_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_1"
+name: "DE+MJ__vae-fix__ns_100_def=0.01-1_nobg__sd-0.1-7.5-v0_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_1"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_18"
 seed: 0
@@ -128,7 +128,7 @@ system:
     enable_bg_rays: true
     allow_empty_flag: false
 
-    sdf_grad_shrink: 0 # sdf is not optimized w.r.t. the rasterizer
+    sdf_grad_shrink: 0.01 # sdf is not optimized w.r.t. the rasterizer
     def_grad_shrink: 1. #[0, 0.0001, 1., 20000] # def is optimized, but start from as small as 0
 
 
