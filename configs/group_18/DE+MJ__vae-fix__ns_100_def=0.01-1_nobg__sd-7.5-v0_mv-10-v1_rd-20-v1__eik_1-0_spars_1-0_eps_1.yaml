@@ -1,4 +1,4 @@
-name: "DE+MJ__vae-fix__ns_100_def=0.01-1_nobg__sd-7.5-v0_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_1"
+name: "DE+MJ__vae-fix__ns_100_def=0-1_nobg__sd-0.1-7.5-v0_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_1"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_18"
 seed: 0
@@ -190,7 +190,7 @@ system:
     rd_plus_random: true
     rd_plus_ratio: 0.
     sd_plus_random: true
-    sd_plus_ratio: 0.
+    sd_plus_ratio: 0.1
 
     # try to save memory cost
     gradient_checkpoint: true
