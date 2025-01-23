@@ -149,9 +149,9 @@ system:
       near_plane: 0.1
       far_plane: 4.0
       train_chunk_size: 0 #100000
-    patch_size: 64
-    global_downsample: 2
-
+    patch_size: 40  # 40 * 40 = 1600
+    global_downsample: 3 # 128 / 3 ~= 42, 42*42=1764, 
+    # 1600 + 1764 = 3364 < 4096 = 64 * 64
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
 
