@@ -1,4 +1,4 @@
-name: "DE+MJ__vol-30-p__sd-7.5-v1_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01"
+name: "DE+MJ__ns-100-p__sd-7.5-v1_mv-20-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_19"
 seed: 0
@@ -136,10 +136,10 @@ system:
     base_renderer_type: generative-space-volsdf-volume-renderer
     base_renderer:
       radius: ${system.geometry.radius}
-      use_volsdf: true
+      use_volsdf: false
       trainable_variance: false # important!
-      learned_variance_init: 0.3401 # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
-
+      learned_variance_init: 0.4605  # 0.4605 = log(100) / 10, 100 is the most common variance across the prompts
+      
       rgb_grad_shrink: [0, 1, 0.01, 20000]
 
       estimator: importance
@@ -162,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: 10 #7.5
+    mv_guidance_scale: 20 #7.5
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD

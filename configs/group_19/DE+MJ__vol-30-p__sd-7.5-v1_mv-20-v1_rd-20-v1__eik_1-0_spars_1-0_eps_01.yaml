@@ -1,4 +1,4 @@
-name: "DE+MJ__vol-30__sd-0.1-7.5-v0_mv-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01"
+name: "DE+MJ__vol-30-p__sd-7.5-v1_mv-20-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_19"
 seed: 0
@@ -11,8 +11,8 @@ data:
   # this drastically reduces VRAM usage as empty space is pruned in early training
   width: 512
   height: 512 # so high resolution !!
-  ray_height: 64
-  ray_width: 64
+  ray_height: 128
+  ray_width: 128
   # unsupervised data
   prompt_library: ???
   unsup_elevation_range: [0, 30]
@@ -131,21 +131,27 @@ system:
     def_grad_shrink: 1 # def is optimized, but start from as small as 0
 
 
-  renderer_2nd_type: generative-space-volsdf-volume-renderer
+  renderer_2nd_type: patch-renderer
   renderer_2nd:
-    radius: ${system.geometry.radius}
-    use_volsdf: true
-    trainable_variance: false # important!
-    learned_variance_init: 0.3401 # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
-    
-    rgb_grad_shrink: [0, 1, 0.01, 20000]
+    base_renderer_type: generative-space-volsdf-volume-renderer
+    base_renderer:
+      radius: ${system.geometry.radius}
+      use_volsdf: true
+      trainable_variance: false # important!
+      learned_variance_init: 0.3401 # 0.3401 = log(30) / 10, 40 is the most common variance across the prompts
 
-    estimator: importance
-    num_samples_per_ray: 64
-    num_samples_per_ray_importance: 128
-    near_plane: 0.1
-    far_plane: 4.0
-    train_chunk_size: 0 #100000
+      rgb_grad_shrink: [0, 1, 0.01, 20000]
+
+      estimator: importance
+      num_samples_per_ray: 64
+      num_samples_per_ray_importance: 128
+
+      near_plane: 0.1
+      far_plane: 4.0
+      train_chunk_size: 0 #100000
+    patch_size: 40  # 40 * 40 = 1600
+    global_downsample: 3 # 128 / 3 ~= 42, 42*42=1764, 
+    # 1600 + 1764 = 3364 < 4096 = 64 * 64
 
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
@@ -156,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: 10 #7.5
+    mv_guidance_scale: 20 #7.5
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
@@ -173,7 +179,7 @@ system:
 
     # the following are specific to SD
     sd_min_step_percent: [0, 0.5, 0.02, 20000]
-    sd_max_step_percent: [0, 0.98, 0.5, 20000]
+    sd_max_step_percent: 0.98
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
     sd_guidance_scale: 7.5
@@ -189,7 +195,7 @@ system:
     rd_plus_random: true
     rd_plus_ratio: 0.
     sd_plus_random: true
-    sd_plus_ratio: 0.1
+    sd_plus_ratio: 0.
 
     # try to save memory cost
     gradient_checkpoint: true
