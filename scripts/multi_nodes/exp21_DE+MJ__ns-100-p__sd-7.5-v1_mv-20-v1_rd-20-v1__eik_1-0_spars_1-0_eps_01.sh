@@ -22,18 +22,9 @@ torchrun \
     --master_port=$port \
     --master_addr=$HOST_NODE_ADDR \
     launch.py \
-        --config configs/group_13/DE+MJ__diffmc-001_dmd_v6-csd_iters_3w_ac_1__eik_0_eps_1e-3_spars_01.yaml \
+        --config configs/group_19/DE+MJ__ns-100-p__sd-7.5-v1_mv-20-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01.yaml \
         --train \
         trainer.num_nodes=$2 \
         data.prompt_library="DALLE_Midjourney_1313928_prompt_library" \
         data.condition_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" \
         data.guidance_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" 
-
-# export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-# python  launch.py \
-#         --config configs/group_13/DE+MJ__diffmc-001_dmd_v3-a_iters_3w_ac_1__eik_0_eps_1e-3_spars_10-50.yaml \
-#         --test \
-#         resume="outputs_13/DE+MJ__diffmc-001_dmd_v3-a_iters_3w_ac_1__eik_0_eps_1e-3_spars_10-50/DALLE_Midjourney_1313928_prompt_library/ckpts/epoch=0-step=10000.ckpt" \
-#         data.prompt_library="DALLE_Midjourney_1313928_prompt_library" \
-#         data.condition_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" \
-#         data.guidance_processor.cache_dir="/dfs/ai-storage/Scaledreamer/.threestudio_cache/text_embeddings_DALLE_Midjourney" 
