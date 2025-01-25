@@ -82,8 +82,9 @@ system:
     sdf_bias: sphere
     sdf_bias_params: 0.5 # a small bias will be fine?
 
-    rotate_planes: v2
+    rotate_planes: v1
     interpolate_feat: v1
+
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
       training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
@@ -98,6 +99,7 @@ system:
 
       conv_out_initiation: null
     encode_position: null
+    
   material_type: no-material
   material:
     n_output_dims: 3
