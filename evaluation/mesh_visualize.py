@@ -1,20 +1,3 @@
-# import os
-# import glob
-# import argparse
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('dir', default='workspace', type=str)
-# parser.add_argument('--gpu', default=0, type=int, help='ID of GPU to use')
-# parser.add_argument('--save_dir', default='ours_dreamfusion_objs', type=str)
-# args = parser.parse_args()
-
-# files = glob.glob(f'{args.dir}/*/*.obj')
-# os.makedirs(args.save_dir, exist_ok=True)
-
-# for file in files:
-#     name = file.split('/')[-2]
-#     save_path = os.path.join(args.save_dir, name)
-#     os.system(f"CUDA_VISIBLE_DEVICES={args.gpu} kire {file} --front_dir '\+y' --save {save_path} --wogui --num_azimuth 4 --H 512 --W 512 --elevation '-15' ")
 
 import os
 import glob
@@ -45,7 +28,8 @@ def process_file(args):
         all_imgs = glob.glob(f'{temp_normal_dir}/*')
         all_imgs.sort()
         for i, img in enumerate(all_imgs):
-            os.system(f'mv {img} {temp_normal_dir}/normal_{i}.png')
+            num_view = int(int(img.split('_')[-1].split('.')[0]) / 360 * num_views)
+            os.system(f'mv {img} {temp_normal_dir}/normal_{num_view}.png')
 
     command = (
         f"CUDA_VISIBLE_DEVICES={gpu_id} kire {file} --front_dir '\\+y' "
@@ -62,7 +46,8 @@ def process_file(args):
     all_imgs = glob.glob(f'{temp_color_dir}/*')
     all_imgs.sort()
     for i, img in enumerate(all_imgs):
-        os.system(f'mv {img} {temp_color_dir}/rgb_{i}.png')
+        num_view = int(int(img.split('_')[-1].split('.')[0]) / 360 * num_views)
+        os.system(f'mv {img} {temp_color_dir}/rgb_{num_view}.png')
 
     # merge the two directories
     if requires_normal:
@@ -90,9 +75,9 @@ if __name__ == '__main__':
     # Create a list of arguments for each file, cycling through the GPU IDs
     tasks = [(file, gpu_ids[i % len(gpu_ids)], args.save_dir, args.num_views, args.requires_normal) for i, file in enumerate(files)]
 
-    # # for debugging
-    # for task in tasks:
-    #     process_file(task)
+    # for debugging
+    for task in tasks:
+        process_file(task)
 
-    with Pool() as pool:
-        pool.map(process_file, tasks)
+    # with Pool() as pool:
+    #     pool.map(process_file, tasks)
