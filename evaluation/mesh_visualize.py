@@ -28,7 +28,11 @@ def process_file(args):
         all_imgs = glob.glob(f'{temp_normal_dir}/*')
         all_imgs.sort()
         for i, img in enumerate(all_imgs):
-            num_view = int(int(img.split('_')[-1].split('.')[0]) / 360 * num_views)
+            num_view = int(
+                # int(img.split('_')[-1].split('.')[0]) \
+                (int(img.split('_')[-1].split('.')[0]) - 90) % 360 \
+                    / 360 * num_views
+            )
             os.system(f'mv {img} {temp_normal_dir}/normal_{num_view}.png')
 
     command = (
@@ -46,7 +50,11 @@ def process_file(args):
     all_imgs = glob.glob(f'{temp_color_dir}/*')
     all_imgs.sort()
     for i, img in enumerate(all_imgs):
-        num_view = int(int(img.split('_')[-1].split('.')[0]) / 360 * num_views)
+        num_view = int(
+            # int(img.split('_')[-1].split('.')[0]) \
+            (int(img.split('_')[-1].split('.')[0]) - 90) % 360 \
+                / 360 * num_views
+        )
         os.system(f'mv {img} {temp_color_dir}/rgb_{num_view}.png')
 
     # merge the two directories
@@ -75,9 +83,9 @@ if __name__ == '__main__':
     # Create a list of arguments for each file, cycling through the GPU IDs
     tasks = [(file, gpu_ids[i % len(gpu_ids)], args.save_dir, args.num_views, args.requires_normal) for i, file in enumerate(files)]
 
-    # for debugging
-    for task in tasks:
-        process_file(task)
+    # # for debugging
+    # for task in tasks:
+    #     process_file(task)
 
-    # with Pool() as pool:
-    #     pool.map(process_file, tasks)
+    with Pool() as pool:
+        pool.map(process_file, tasks)
