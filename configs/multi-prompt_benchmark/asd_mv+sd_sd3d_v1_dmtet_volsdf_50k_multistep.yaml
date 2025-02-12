@@ -65,9 +65,9 @@ system:
   num_steps_sampling: 50
   noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
-  classifier_guidance_scale_training: 1. # any of 1, 7.5, or other values
-  classifier_guidance_scale_sampling: 1. # any of 1, 7.5, or other values
-  pure_zeros_training: false # TBD
+  classifier_guidance_scale_training: 1.0 # any of 1, 7.5, or other values
+  classifier_guidance_scale_sampling: 4.0 # any of 1, 7.5, or other values
+  pure_zeros_training: true # TBD
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
 
@@ -83,16 +83,17 @@ system:
     rotate_planes: v2
     interpolate_feat: v3
     space_generator_config:
-      pretrained_model_name_or_path: "pretrained/sd-turbo" # TBD
+      pretrained_model_name_or_path:  "pretrained/stable-diffusion-2-1-base" # TBD
       training_type: "self_lora_rank_16-cross_lora_rank_16-locon_rank_16-with_bias" 
       timestep: 999
       output_dim: 33
-      # gradient_checkpoint: true
       self_lora_type: "triple_v1"
       cross_lora_type: "triple_v1"
       locon_type: "vanilla_v1"
       prompt_bias: true
-
+      prompt_bias_lr_multiplier: 10.
+      # # try to save memory cost
+      # gradient_checkpoint: true
 
   material_type: no-material
   material:

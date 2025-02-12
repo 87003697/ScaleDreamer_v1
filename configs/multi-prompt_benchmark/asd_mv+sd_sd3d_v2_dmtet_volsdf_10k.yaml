@@ -41,15 +41,16 @@ system:
     sdf_bias: sphere
     sdf_bias_params: 0.5 # a small bias will be fine?
 
-    rotate_planes: v1
+    rotate_planes: v2
     interpolate_feat: v1
     space_generator_config:
       pretrained_model_name_or_path: "pretrained/sd-turbo"
-      training_type: "lora_rank_32_locon_rank_32_with_bias" # _with_bias
+      training_type: "self_lora_rank_32-cross_lora_rank_32-locon_rank_32-with_bias" # _with_bias
       timestep: 999
       output_dim: 32
       # gradient_checkpoint: true
-      lora_type: "vanilla" # "quadra_v1" "vanilla"
+      self_lora_type: "quadra_v1" # "quadra_v1" "vanilla"
+      cross_lora_type: "vanilla" # "quadra_v1" "vanilla"
       locon_type: "vanilla_v2" # "quadra_v1" "quadra_v2" "vanilla_v1" "vanilla_v2"
 
   material_type: no-material
@@ -58,9 +59,9 @@ system:
     requires_normal: true
     color_activation: sigmoid-mipnerf # follow OpenLRM
 
-  background_type: "solid-color-background"
+  background_type: "multi-prompt-neural-hashgrid-environment-map-background"
   background:
-    color: [0.5, 0.5, 0.5]
+    color_activation: sigmoid-mipnerf # follow OpenLRM
     random_aug: false
     
   renderer_type: generative-space-dmtet-rasterize-renderer
@@ -103,14 +104,21 @@ system:
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" # path to a pre-downloaded checkpoint file (null for loading from URL)
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     weighting_strategy: "uniform"
-    guidance_scale: 7.5
-    plus_ratio: 0.1
-    plus_random: true
     min_step_percent: [0, 0.5, 0.02, 100000] # follow MVDrea
     max_step_percent: [0, 0.98, 0.5, 100000] # same as vsd
+    # the following are specific to SD
     sd_weight: 1.
-    mv_weight: 1.
+    sd_guidance_scale: 7.5
     dual_render_sync_view_sd: false # sample same view for both renderers    
+    # the following are specific to MV
+    mv_weight: 1.
+    mv_guidance_scale: 7.5
+    # the following are specific to ASD
+    plus_ratio: 0.1
+    plus_schedule: "sqrt_100"
+    # the following are specific to the combination of ASD with MV and SD
+    mv_plus_random: true
+    sd_plus_random: true
 
   loggers:
     wandb:

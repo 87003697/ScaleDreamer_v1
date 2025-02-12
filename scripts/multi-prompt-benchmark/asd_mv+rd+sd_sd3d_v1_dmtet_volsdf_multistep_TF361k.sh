@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7  python launch.py \
+CUDA_VISIBLE_DEVICES=4,5,6,7  python launch.py \
     --config configs/multi-prompt_benchmark/asd_mv+rd+sd_sd3d_v1_dmtet_volsdf_500k_multistep.yaml \
     --train \
     data.prompt_library="3DTopia_361k_prompt_library" \

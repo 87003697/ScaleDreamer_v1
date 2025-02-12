@@ -69,8 +69,8 @@ system:
   noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
-  specifiy_guidance_timestep: v2 # any of null, v1
-  predition_type: "sample_delta_v2" # any of "epsilon", "sample", "sample_delta", "sample_delta_v2"
+  specifiy_guidance_timestep: null # any of null, v1
+  predition_type: "epsilon" # any of "epsilon", "sample", "sample_delta", "sample_delta_v2"
 
   geometry_type: "one-step-triplane-stable-diffusion"
   geometry:
@@ -133,21 +133,22 @@ system:
   guidance_type: "richdreamer-mvdream-asynchronous-score-distillation-guidance"
   guidance:
     min_step_percent: [0, 0.5, 0.02, 60000] # follow MVDrea
-    max_step_percent: 0.98 #[0, 0.98, 0.5, 60000] # same as vsd
+    max_step_percent: [0, 0.98, 0.5, 60000] # same as vsd
     
     # the following are specific to RD
     rd_model_name_or_path: "nd-mv"
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
-    rd_weight: 1.
+    rd_weight: 10.
     rd_guidance_scale: 7.5
-    rd_weighting_strategy: "uniform"
+    rd_weighting_strategy: "fantasia3d"
+    # cam_method: "abs" # "rel_x2", "rel" or "abs"
 
     # the following are specific to MV
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
     mv_guidance_scale: 7.5 #7.5
-    mv_weighting_strategy: "uniform"
+    mv_weighting_strategy: "fantasia3d"
 
     # the following are specific to ASD
     plus_schedule: "linear"

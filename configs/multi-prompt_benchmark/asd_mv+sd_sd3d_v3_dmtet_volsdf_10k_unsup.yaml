@@ -95,7 +95,8 @@ system:
   background_type: "multi-prompt-neural-hashgrid-environment-map-background"
   background:
     color_activation: sigmoid-mipnerf # follow OpenLRM
-    random_aug: false
+    random_aug: true
+    random_aug_color: [1.0, 1.0, 1.0]
     # eval_color: [0.5, 0.5, 0.5]
 
   renderer_type: generative-space-dmtet-rasterize-renderer
