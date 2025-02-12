@@ -163,7 +163,7 @@ system:
     n_view: ${data.n_view}
 
     era3d_plus_random: true
-    era3d_plus_ratio: 0.1
+    era3d_plus_ratio: 0.
 
     era3d_min_step_percent: [0, 0.5, 0.02, 20000]
     era3d_max_step_percent: 0.98
