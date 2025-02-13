@@ -4,6 +4,8 @@ import torch
 import time
 from PIL import Image
 import numpy as np
+from tqdm import tqdm
+import json
 
 from diffusers import StableDiffusionXLPipeline
 
@@ -68,6 +70,8 @@ def preprocess(predictor, input_image, chk_group=None, segment=True, rescale=Fal
         x_max = int(x_nonzero[0].max())
         y_max = int(y_nonzero[0].max())
         input_image = sam_segment(predictor, input_image.convert('RGB'), x_min, y_min, x_max, y_max)
+    else:
+        input_image = input_image.convert('RGBA')
     # Rescale and recenter
     if rescale:
         image_arr = np.array(input_image)
@@ -103,11 +107,26 @@ pipeline_text2image.load_lora_weights(
 pipeline_text2image.fuse_lora(lora_scale=1.0)
 
 
-prompt = "Professional 2d anime portrait of a man, highly detailed"
 
-image = pipeline_text2image(prompt=prompt).images[0]
+json_file = "load/3DTopia_361k_prompt_library.json"
+save_dir = "datasets_real/sdxl_3d_animation_noseg"
 
-# image.save("output.png")
-processed_image_highres, processed_image = preprocess(predictor, image, chk_group=None, segment=True, rescale=True)
+with open(json_file, "r") as f:
+    prompts_dict = json.load(f)
+prompts = []
+if "train" in prompts_dict:
+    prompts.extend(prompts_dict["train"])
+if "test" in prompts_dict:
+    prompts.extend(prompts_dict["test"])
+
+os.makedirs(save_dir, exist_ok=True)
+for prompt in tqdm(prompts):
+    print(prompt)
+    if len(prompt.replace(",", " ").split()) > 20:
+        continue
+    prompt = prompt.replace("/", " ")
+    image = pipeline_text2image(prompt=prompt).images[0]
+    processed_image_highres, processed_image = preprocess(predictor, image, chk_group=None, segment=True, rescale=True)
+    processed_image.save(os.path.join(save_dir, f"{prompt}.png"))
 
 # processed_image_highres.save("output_highres.png")
