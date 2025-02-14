@@ -40,23 +40,26 @@ data:
 
   guidance_processor_type: "sd-unclip-multi-reference-processor-callable"
   guidance_processor:
-    spawn: True
-    pretrained_model_name_or_path: "pretrained/Era3D-512-6view" # used by RichDreamer
+    spawn: True # if True, the process will be parallelized and accelerated
+    pretrained_model_name_or_path: "pretrained/Era3D-512-6view" #
     image_root_dir: ${data.image_root_dir}
     use_latent: True
     use_embed_global: True
-    # use_embed_local: True
+    use_embed_local: True
     image_size: [512, 512]
+    crop_size: 420 # same as Era3D
 
   condition_processor_type: "sd-unclip-multi-reference-processor-callable"
   condition_processor:
-    spawn: True
-    pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-unclip" # used by RichDreamer
+    spawn: True # if True, the process will be parallelized and accelerated
+    pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-unclip"
     image_root_dir: ${data.image_root_dir}
     use_latent: False # important for hexa
     use_embed_global: True
     use_embed_local: True
     image_size: [256, 256]
+    crop_size: 192 # same as wonder3D
+
 
 system_type: "multiimage-dual-renderer-multistep-generator-system"
 system:
@@ -97,7 +100,7 @@ system:
       output_dim: 32
       # gradient_checkpoint: true
       self_lora_type: "hexa_v1" #
-      cross_lora_type: "hexa_v1"
+      cross_lora_type: "vanilla"
       locon_type: "vanilla_v1"
       vae_attn_type: "basic" # "basic", "vanilla"
 
@@ -162,21 +165,27 @@ system:
   guidance:
     n_view: ${data.n_view}
 
+    # related to asynchonous score distillation
     era3d_plus_random: true
     era3d_plus_ratio: 0.
 
+    # general settings
     era3d_min_step_percent: [0, 0.5, 0.02, 20000]
     era3d_max_step_percent: 0.98
+    era3d_guidance_scale: 3.
 
-    era3d_guidance_scale: 7.5
-
-    era3d_normal_weight: [0, 0., 1., 20000]
+    # related to the guidance weight specificly introduced to era3d
+    era3d_normal_weight: [0, 0., 1., 100]
     era3d_color_weight: 1.
 
+    # related to dmd weighting strategy
     eps: 0.1
 
+    # to save memory
     auto_grad: true
     gradient_checkpoint: true
+
+    # half_precision_weights: false
 
 
   loggers:
@@ -228,8 +237,8 @@ trainer:
   max_steps: 500000
   log_every_n_steps: 1
   num_sanity_val_steps: 0
-  # val_check_interval: 2000
-  check_val_every_n_epoch: 1000
+  val_check_interval: 100
+  # check_val_every_n_epoch: 1000
   enable_progress_bar: true
   precision: 32
   strategy: "ddp" # "deepspeed_stage_2"
@@ -238,5 +247,5 @@ trainer:
 checkpoint:
   save_last: true
   save_top_k: -1
-  # every_n_train_steps: ${trainer.val_check_interval}
-  every_n_epochs: ${trainer.check_val_every_n_epoch}
+  every_n_train_steps: ${trainer.val_check_interval}
+  # every_n_epochs: ${trainer.check_val_every_n_epoch}

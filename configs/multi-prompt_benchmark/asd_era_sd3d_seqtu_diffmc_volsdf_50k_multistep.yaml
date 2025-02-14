@@ -40,23 +40,26 @@ data:
 
   guidance_processor_type: "sd-unclip-multi-reference-processor-callable"
   guidance_processor:
-    spawn: True
-    pretrained_model_name_or_path: "pretrained/Era3D-512-6view" # used by RichDreamer
-    image_root_dir: ${data.image_root_dir}
-    use_latent: True
-    use_embed_global: True
-    # use_embed_local: True
-    image_size: [512, 512]
-
-  condition_processor_type: "sd-unclip-multi-reference-processor-callable"
-  condition_processor:
-    spawn: True
-    pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-unclip" # used by RichDreamer
+    spawn: True # if True, the process will be parallelized and accelerated
+    pretrained_model_name_or_path: "pretrained/Era3D-512-6view" #
     image_root_dir: ${data.image_root_dir}
     use_latent: True
     use_embed_global: True
     use_embed_local: True
+    image_size: [512, 512]
+    crop_size: 420 # same as Era3D
+
+  condition_processor_type: "sd-unclip-multi-reference-processor-callable"
+  condition_processor:
+    spawn: True # if True, the process will be parallelized and accelerated
+    pretrained_model_name_or_path: "pretrained/stable-diffusion-2-1-unclip"
+    image_root_dir: ${data.image_root_dir}
+    use_latent: False # important for hexa
+    use_embed_global: True
+    use_embed_local: True
     image_size: [256, 256]
+    crop_size: 192 # same as wonder3D
+
 
 system_type: "multiimage-dual-renderer-multistep-generator-system"
 system:
@@ -163,14 +166,14 @@ system:
     n_view: ${data.n_view}
 
     era3d_plus_random: true
-    era3d_plus_ratio: 0.
+    era3d_plus_ratio: 0.1
 
     era3d_min_step_percent: [0, 0.5, 0.02, 20000]
     era3d_max_step_percent: 0.98
 
-    era3d_guidance_scale: 7.5
+    era3d_guidance_scale: 3
 
-    era3d_normal_weight: [0, 0., 1., 20000]
+    era3d_normal_weight: [0, 0., 1., 1000]
     era3d_color_weight: 1.
 
     eps: 0.1
