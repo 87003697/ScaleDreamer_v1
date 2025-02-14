@@ -10,6 +10,16 @@ import random
 #   /home/zhiyuan_ma/code/ScaleDreamer_v1/load/sdxl_3d_animation_v1_7_image_library.json \
 #   --val_split 0.3 --test_split 0.3
 
+# python load/make_image_library.py \
+#   datasets/sdxl_3d_animation_v2_2056 \
+#   /home/zhiyuan_ma/code/ScaleDreamer_v1/load/sdxl_3d_animation_v2_2056_image_library.json \
+#   --val_split 0.01 --test_split 0.1
+
+# python load/make_image_library.py \
+#   datasets/layerdiffuse_v1 \
+#   /home/zhiyuan_ma/code/ScaleDreamer_v1/load/layerdiffuse_v1_image_library.json \
+#   --val_split 0.01 --test_split 0.01
+
 IMAGE_FILE_TYPES = ['jpg', 'jpeg', 'png']
 
 if __name__ == '__main__':
