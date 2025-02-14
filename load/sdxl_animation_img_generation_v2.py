@@ -112,12 +112,13 @@ def preprocess(predictor, input_image, chk_group=None, segment=True, rescale=Fal
         padded_image[center - h // 2 : center - h // 2 + h, center - w // 2 : center - w // 2 + w] = image_arr[y : y + h, x : x + w]
         rgba = Image.fromarray(padded_image).resize((out_res, out_res), Image.LANCZOS)
 
-        rgba_arr = np.array(rgba) / 255.0
-        rgb = rgba_arr[..., :3] * rgba_arr[..., -1:] + (1 - rgba_arr[..., -1:])
-        input_image = Image.fromarray((rgb * 255).astype(np.uint8))
+        # rgba_arr = np.array(rgba) / 255.0
+        # rgb = rgba_arr[..., :3] * rgba_arr[..., -1:] + (1 - rgba_arr[..., -1:])
+        # input_image = Image.fromarray((rgb * 255).astype(np.uint8))
     else:
-        input_image = expand2square(input_image, (127, 127, 127, 0))
-    return input_image, input_image.resize((320, 320), Image.Resampling.LANCZOS)
+        # input_image = expand2square(input_image, (127, 127, 127, 0))
+        raise NotImplementedError
+    return rgba
 ####################################################################################################
 
 predictor = sam_init()
@@ -144,5 +145,5 @@ for prompt in tqdm(all_prompts, desc="Generating images at {}".format(args.group
     ).images
     for i, image in enumerate(images):
         i += 100 # start from 100
-        processed_image_highres, processed_image = preprocess(predictor, image, chk_group=None, segment=True, rescale=True)
-        processed_image_highres.save(os.path.join(save_dir, f"{i:03d}.png"))
+        processed_image = preprocess(predictor, image, chk_group=None, segment=True, rescale=True)
+        processed_image.save(os.path.join(save_dir, f"{i:03d}.png"))
