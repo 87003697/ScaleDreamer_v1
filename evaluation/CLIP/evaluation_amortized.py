@@ -60,10 +60,10 @@ if __name__ == '__main__':
     # remove the '_' in the prompts with ' '
     prompts_inputs = [prompt.replace('_', ' ') for prompt in prompts]
 
-    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-large-patch14", force_download=False)
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-base-patch32", force_download=False)
     # Load models and create wrapper for stable diffusion
-    text_encoder = CLIPTextModelWithProjection.from_pretrained("openai/clip-vit-large-patch14", force_download=False).to(device)
-    image_encoder = CLIPVisionModelWithProjection.from_pretrained("openai/clip-vit-large-patch14", force_download=False).to(device)
+    text_encoder = CLIPTextModelWithProjection.from_pretrained("openai/clip-vit-base-patch32", force_download=False).to(device)
+    image_encoder = CLIPVisionModelWithProjection.from_pretrained("openai/clip-vit-base-patch32", force_download=False).to(device)
 
     text_inputs = tokenizer(
         prompts_inputs,
