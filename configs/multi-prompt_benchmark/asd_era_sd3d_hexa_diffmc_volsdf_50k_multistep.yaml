@@ -18,8 +18,8 @@ data:
   image_library: ???
   unsup_elevation_range: [0, 0]
   unsup_azimuth_list: [0, 45, 90, 180, 270, 315] # 6 views
-  unsup_camera_distance_list: [2, 1.414, 2, 2, 2, 1.414] 
-  eval_camera_distance: 2 
+  unsup_camera_distance_list: [2, 1.414, 2, 2, 2 , 1.414] 
+  eval_camera_distance: 1
   # eval_fovy_deg: 40. # not used
   n_val_views: 40
   n_test_views: 120
@@ -73,7 +73,7 @@ system:
   num_parts_training: 4 # TBD
   num_steps_training: 4 # TBD
   num_steps_sampling: 4
-  noise_scheduler: "ddim" 
+  noise_scheduler: "ddpm" 
   sample_scheduler: "ddim" 
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
@@ -85,7 +85,7 @@ system:
     normal_type: "analytic"
 
     sdf_bias: sphere
-    sdf_bias_params: 0.5 # a small bias will be fine?
+    sdf_bias_params: 0.3 # a small bias will be fine?
 
     rotate_planes: v1
     split_channels: v1 # v1: split channels for geometry and texture triplanes
