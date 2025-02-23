@@ -1,0 +1,7 @@
+{
+    "search.useGlobalIgnoreFiles": true,
+    "search.quickOpen.includeSymbols": true,
+    "files.exclude": {
+        "**/datasets_real": true,
+      }
+}
