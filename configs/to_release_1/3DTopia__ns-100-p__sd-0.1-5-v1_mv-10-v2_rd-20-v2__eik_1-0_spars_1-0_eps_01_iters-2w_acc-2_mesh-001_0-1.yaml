@@ -128,7 +128,7 @@ system:
     allow_empty_flag: false
 
     sdf_grad_shrink: 0.01 # sdf is not optimized w.r.t. the rasterizer
-    def_grad_shrink: [0, 0., 1., 20000] # def is optimized, but start from as small as 0
+    def_grad_shrink: [0, 0.01, 1., 20000] # def is optimized, but start from as small as 0
 
 
   renderer_2nd_type: patch-renderer
