@@ -1,19 +1,19 @@
 import os
 import re
 import json
+from tqdm import tqdm
+
 import torch
-import torch.nn as nn
 from typing import *
 from dataclasses import dataclass, field
-
 from diffusers import StableDiffusionPipeline
-from diffusers.configuration_utils import FrozenDict
-from diffusers.loaders import AttnProcsLayers
 
 from .base import Pipeline
 from ..models.geometry import StableDiffusionTriplaneDualAttention
+from ..utils.mesh_exporter import isosurface, colorize_mesh, DiffMarchingCubeHelper
 
-from tqdm import tqdm
+from diffusers.loaders import AttnProcsLayers
+from ..models.networks import get_activation
 
 @dataclass
 class TriplaneTurboTextTo3DPipelineConfig:
@@ -67,6 +67,10 @@ class TriplaneTurboTextTo3DPipelineConfig:
         }
     )
 
+    isosurface_deformable_grid: bool = True
+    isosurface_resolution: int = 160
+    color_activation: str = "sigmoid-mipnerf"
+
     @classmethod
     def from_pretrained(cls, pretrained_path: str) -> "TriplaneTurboTextTo3DPipelineConfig":
         """Load config from pretrained path"""
@@ -88,14 +92,21 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
     def __init__(
         self,
         geometry: StableDiffusionTriplaneDualAttention,
+        material: Callable,
         base_pipeline: StableDiffusionPipeline,
         sample_scheduler: Callable,
+        isosurface_helper: Callable,
         **kwargs,
     ):
         super().__init__()
         self.geometry = geometry
+        self.material = material
+
         self.base_pipeline = base_pipeline
+
         self.sample_scheduler = sample_scheduler
+        self.isosurface_helper = isosurface_helper
+
 
         self.models = {
             "geometry": geometry,
@@ -147,19 +158,35 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
                 vae=base_pipeline.vae,
                 unet=base_pipeline.unet,
             )
+
+        # no gradient for geometry
+        for param in geometry.parameters():
+            param.requires_grad = False
+
         # and load adapter weights
         if pretrained_model_name_or_path.endswith(".pth"):
             state_dict = torch.load(pretrained_model_name_or_path)
-            _, unused = geometry.load_state_dict(state_dict, strict=False)
-            assert len(unused) == 0, f"Unused keys: {unused}"
+            new_state_dict = state_dict
+            _, unused = geometry.load_state_dict(new_state_dict, strict=False)
+            if len(unused) > 0:
+                print(f"Unused keys: {unused}")
         else:
             raise ValueError(f"Unknown pretrained model name or path: {pretrained_model_name_or_path}")
+
+
+        # load material, convert to int
+        # material = lambda x: (256 * get_activation(config.color_activation)(x)).int()
+        material = get_activation(config.color_activation)
 
         # Load geometry model
         pipeline = cls(
             base_pipeline=base_pipeline,
             geometry=geometry,
             sample_scheduler=sample_scheduler,
+            material=material,
+            isosurface_helper=DiffMarchingCubeHelper(
+                resolution=config.isosurface_resolution,
+            ),
             **kwargs,
         )
         return pipeline
@@ -203,6 +230,7 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         generator: Optional[torch.Generator] = None,
         latents: Optional[torch.FloatTensor] = None,
         return_dict: bool = True,
+        colorize: bool = True,
         **kwargs,
     ):
         # Implementation similar to Zero123Pipeline
@@ -222,13 +250,13 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         # Generate latents if not provided
         if latents is None:
             latents = torch.randn(
-                (batch_size * 6, 4, 64, 64), # hard-coded for now
+                (batch_size * 6, 4, 32, 32), # hard-coded for now
                 generator=generator,
                 device=self.device,
             )
-        
+
         # Process text prompt through geometry module
-        text_embeddings, _ = self.encode_prompt(prompt, self.device, num_results_per_prompt)
+        text_embed, _ = self.encode_prompt(prompt, self.device, num_results_per_prompt)
         
         # Run diffusion process
         # Set up timesteps for sampling
@@ -237,40 +265,58 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
             num_inference_steps
         )
 
-        # Run diffusion process
-        for i, t in tqdm(enumerate(timesteps)):
-            # Scale model input
-            noisy_latent_input = self.sample_scheduler.scale_model_input(
-                latents, 
-                t
+
+        with torch.no_grad():
+            # Run diffusion process
+            for i, t in tqdm(enumerate(timesteps)):
+                # Scale model input
+                noisy_latent_input = self.sample_scheduler.scale_model_input(
+                    latents, 
+                    t
+                )
+
+                # Predict noise/sample
+                pred = self.geometry.denoise(
+                    noisy_input=noisy_latent_input,
+                    text_embed=text_embed,
+                    timestep=t.to(self.device),
+                )
+
+                # Update latents
+                results = self.sample_scheduler.step(pred, t, latents)
+                latents = results.prev_sample
+                latents_denoised = results.pred_original_sample
+
+            # Use final denoised latents
+            latents = latents_denoised
+            
+            # Generate final 3D representation
+            space_cache = self.geometry.decode(latents)
+
+            # Extract mesh from space cache
+            mesh_list = isosurface(
+                space_cache,
+                self.geometry.forward_field,
+                self.isosurface_helper,
             )
 
-            # Predict noise/sample
-            pred = self.geometry.denoise(
-                noisy_input=noisy_latent_input,
-                text_embed=text_embeddings,
-                timestep=t.to(self.device),
-            )
-
-            # Update latents
-            results = self.sample_scheduler.step(pred, t, latents)
-            latents = results.prev_sample
-            latents_denoised = results.pred_original_sample
-
-        # Use final denoised latents
-        latents = latents_denoised
-        
-        # Generate final 3D representation
-        space_cache = self.geometry.decode(latents)
+            if colorize:
+                mesh_list = colorize_mesh(
+                    space_cache,
+                    self.geometry.export,
+                    mesh_list,
+                    activation=self.material,
+                )
 
         # decide output type based on return_dict
         if return_dict:
             return {
                 "space_cache": space_cache,
                 "latents": latents,
+                "mesh": mesh_list,
             }
         else:
-            return space_cache
+            return mesh_list
 
     def _set_timesteps(
         self,
@@ -292,3 +338,4 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         timesteps_delta = scheduler.config.num_train_timesteps - 1 - timesteps_orig.max()
         timesteps = timesteps_orig + timesteps_delta
         return timesteps
+

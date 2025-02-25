@@ -25,80 +25,80 @@ def scale_tensor(
     return dat
 
 def contract_to_unisphere_custom(
-    x: Float[Tensor, "... 3"], 
-    bbox: Float[Tensor, "2 3"],
-    radius: float = 1.0
+    x: Float[Tensor, "... 3"], bbox: Float[Tensor, "2 3"], unbounded: bool = False
 ) -> Float[Tensor, "... 3"]:
-    """Custom version of contract_to_unisphere for triplane representation"""
-    x = scale_tensor(x, bbox, (0, 1))
-    x = x * 2 - 1  # Scale to [-1, 1]
-    mag = x.norm(dim=-1, keepdim=True)
-    mask = mag.squeeze(-1) > radius
-    x[mask] = (2 - radius / mag[mask]) * (x[mask] / mag[mask])
+    if unbounded:
+        x = scale_tensor(x, bbox, (-1, 1))
+        x = x * 2 - 1  # aabb is at [-1, 1]
+        mag = x.norm(dim=-1, keepdim=True)
+        mask = mag.squeeze(-1) > 1
+        x[mask] = (2 - 1 / mag[mask]) * (x[mask] / mag[mask])
+        x = x / 4 + 0.5  # [-inf, inf] is at [0, 1]
+    else:
+        x = scale_tensor(x, bbox, (-1, 1))
     return x
 
-def sample_from_planes(
-    plane_features: Float[Tensor, "B P C H W"],
-    coordinates: Float[Tensor, "B N 3"],
-    interpolate_feat: str = "v1"
-) -> Float[Tensor, "B N C"]:
-    """Sample features from triplane representation at given coordinates.
-    
-    Args:
-        plane_features: Tensor of shape [batch, num_planes, channels, height, width]
-        coordinates: Tensor of shape [batch, num_points, 3] in [-1, 1]
-        interpolate_feat: Interpolation method ("v1" or "v2")
-        
-    Returns:
-        Sampled features tensor of shape [batch, num_points, channels]
+# bug fix in https://github.com/NVlabs/eg3d/issues/67
+planes =  torch.tensor(
+            [
+                [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 1]
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 0, 1],
+                    [0, 1, 0]
+                ],
+                [
+                    [0, 0, 1],
+                    [0, 1, 0],
+                    [1, 0, 0]
+                ]
+            ], dtype=torch.float32)
+
+
+def grid_sample(input, grid):
+    # if grid.requires_grad and _should_use_custom_op():
+    #     return grid_sample_2d(input, grid, padding_mode='zeros', align_corners=False)
+    return torch.nn.functional.grid_sample(input=input, grid=grid, mode='bilinear', padding_mode='zeros', align_corners=False)
+
+
+def project_onto_planes(planes, coordinates):
     """
-    B, P, C, H, W = plane_features.shape
-    N = coordinates.shape[1]
-    
-    # Sample from each plane
-    features = []
-    
-    # XY plane (Z axis)
-    xy_plane = plane_features[:, 0]  # [B, C, H, W]
-    xy_coords = coordinates[..., [0, 1]]  # [B, N, 2]
-    xy_features = F.grid_sample(
-        xy_plane, 
-        xy_coords.view(B, 1, -1, 2),
-        mode='bilinear',
-        align_corners=True
-    ).view(B, C, N)
-    features.append(xy_features)
-    
-    # XZ plane (Y axis)
-    xz_plane = plane_features[:, 1]
-    xz_coords = coordinates[..., [0, 2]]
-    xz_features = F.grid_sample(
-        xz_plane,
-        xz_coords.view(B, 1, -1, 2),
-        mode='bilinear',
-        align_corners=True
-    ).view(B, C, N)
-    features.append(xz_features)
-    
-    # YZ plane (X axis)
-    yz_plane = plane_features[:, 2]
-    yz_coords = coordinates[..., [1, 2]]
-    yz_features = F.grid_sample(
-        yz_plane,
-        yz_coords.view(B, 1, -1, 2),
-        mode='bilinear',
-        align_corners=True
-    ).view(B, C, N)
-    features.append(yz_features)
-    
-    # Combine features based on interpolation method
-    if interpolate_feat == "v1":
-        # Average pooling
-        features = torch.stack(features, dim=0).mean(0)
-    elif interpolate_feat == "v2":
-        # Concatenate features
-        features = torch.cat(features, dim=1)
-    else:
-        raise ValueError(f"Unknown interpolation method: {interpolate_feat}")
-        
-    return features.permute(0, 2, 1)  # [B, N, C] 
+    Does a projection of a 3D point onto a batch of 2D planes,
+    returning 2D plane coordinates.
+
+    Takes plane axes of shape n_planes, 3, 3
+    # Takes coordinates of shape N, M, 3
+    # returns projections of shape N*n_planes, M, 2
+    """
+    N, M, C = coordinates.shape
+    n_planes, _, _ = planes.shape
+    coordinates = coordinates.unsqueeze(1).expand(-1, n_planes, -1, -1).reshape(N*n_planes, M, 3)
+    inv_planes = torch.linalg.inv(planes).unsqueeze(0).expand(N, -1, -1, -1).reshape(N*n_planes, 3, 3)
+    projections = torch.bmm(coordinates, inv_planes)
+    return projections[..., :2]
+
+def sample_from_planes(plane_features, coordinates, mode='bilinear', padding_mode='zeros', box_warp=2, interpolate_feat: Optional[str] = 'None'):
+    assert padding_mode == 'zeros'
+    N, n_planes, C, H, W = plane_features.shape
+    _, M, _ = coordinates.shape
+    plane_features = plane_features.view(N*n_planes, C, H, W)
+
+    coordinates = (2/box_warp) * coordinates # add specific box bounds
+
+    if interpolate_feat in [None, "v1"]:
+        projected_coordinates = project_onto_planes(planes.to(coordinates), coordinates).unsqueeze(1)
+        output_features = grid_sample(plane_features, projected_coordinates.float())
+        output_features = output_features.permute(0, 3, 2, 1).reshape(N, n_planes, M, C)
+        output_features = output_features.sum(dim=1, keepdim=True).reshape(N, M, C)
+
+    elif interpolate_feat in ["v2"]:
+        projected_coordinates = project_onto_planes(planes.to(coordinates), coordinates).unsqueeze(1)
+        output_features = grid_sample(plane_features, projected_coordinates.float())
+        output_features = output_features.permute(0, 3, 2, 1).reshape(N, n_planes, M, C)
+        output_features = output_features.permute(0, 2, 1, 3).reshape(N, M, n_planes*C)        
+
+    return output_features.contiguous()
