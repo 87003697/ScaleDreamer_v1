@@ -551,7 +551,6 @@ class TriplaneCrossAttentionLoRAAttnProcessor(nn.Module):
     def __call__(
         self, attn: Attention, hidden_states, encoder_hidden_states=None, attention_mask=None, scale=1.0, temb=None
     ):
-        # import pdb; pdb.set_trace()
         assert encoder_hidden_states is not None, "The encoder_hidden_states should not be None."
 
         residual = hidden_states
@@ -731,103 +730,135 @@ class OneStepTriplaneDualStableDiffusion(nn.Module):
         self.device = next(self.unet.parameters()).device
         
         # Remove unused components
-        del self.vae.encoder
-        del self.vae.quant_conv 
+        del vae.encoder
+        del vae.quant_conv 
 
         # Get training type from config
         training_type = self.cfg.training_type
 
         # save trainable parameters
-        trainable_params = {}
+        if not "full" in training_type: # then paramter-efficient training
 
+            trainable_params = {}
 
-        if "lora" in training_type:
-            # parse the rank from the training type, with the template "lora_rank_{}"
-            assert "self_lora_rank" in training_type, "The self_lora_rank is not specified."
-            rank = re.search(r"self_lora_rank_(\d+)", training_type).group(1)
-            self.self_lora_rank = int(rank)
+            assert "lora" in training_type or "locon" in training_type, "The training type is not supported."
+            @dataclass
+            class SubModules:
+                unet: UNet2DConditionModel
+                vae: AutoencoderKL
 
-            assert "cross_lora_rank" in training_type, "The cross_lora_rank is not specified."
-            rank = re.search(r"cross_lora_rank_(\d+)", training_type).group(1)
-            self.cross_lora_rank = int(rank)
-
-            # if the finetuning is with bias
-            self.w_lora_bias = False
-            if "with_bias" in training_type:
-                self.w_lora_bias = True
-
-            # specify the attn_processor for unet
-            lora_attn_procs = self._set_attn_processor(
-                self.unet, 
-                self_attn_name="attn1.processor",
-                self_lora_type=self.cfg.self_lora_type,
-                cross_lora_type=self.cfg.cross_lora_type
-            )
-            self.unet.set_attn_processor(lora_attn_procs)
-            # update the trainable parameters
-            trainable_params.update(self.unet.attn_processors)
-
-            # specify the attn_processor for vae
-            lora_attn_procs = self._set_attn_processor(
-                self.vae, 
-                self_attn_name="processor",
-                self_lora_type=self.cfg.vae_attn_type, # hard-coded for vae 
-                cross_lora_type="vanilla"
-            )
-            self.vae.set_attn_processor(lora_attn_procs)
-            # update the trainable parameters
-            trainable_params.update(self.vae.attn_processors)
-        else:
-            raise NotImplementedError("The training type is not supported.")
-
-        if "locon" in training_type:
-            # parse the rank from the training type, with the template "locon_rank_{}"
-            rank = re.search(r"locon_rank_(\d+)", training_type).group(1)
-            self.locon_rank = int(rank)
-
-            # if the finetuning is with bias
-            self.w_locon_bias = False
-            if "with_bias" in training_type:
-                self.w_locon_bias = True
-
-            # specify the conv_processor for unet
-            locon_procs = self._set_conv_processor(
-                self.unet,
-                locon_type=self.cfg.locon_type
+            self.submodules = SubModules(
+                unet=unet.to(self.device),
+                vae=vae.to(self.device),
             )
 
-            # update the trainable parameters
-            trainable_params.update(locon_procs)
+            # free all the parameters
+            for param in self.unet.parameters():
+                param.requires_grad_(False)
+            for param in self.vae.parameters():
+                param.requires_grad_(False)
 
-            # specify the conv_processor for vae
-            locon_procs = self._set_conv_processor(
-                self.vae,
-                locon_type="vanilla_v1", # hard-coded for vae decoder
+                ############################################################
+                # overwrite the unet and vae with the customized processors
+
+            if "lora" in training_type:
+
+                # parse the rank from the training type, with the template "lora_rank_{}"
+                assert "self_lora_rank" in training_type, "The self_lora_rank is not specified."
+                rank = re.search(r"self_lora_rank_(\d+)", training_type).group(1)
+                self.self_lora_rank = int(rank)
+
+                assert "cross_lora_rank" in training_type, "The cross_lora_rank is not specified."
+                rank = re.search(r"cross_lora_rank_(\d+)", training_type).group(1)
+                self.cross_lora_rank = int(rank)
+
+                # if the finetuning is with bias
+                self.w_lora_bias = False
+                if "with_bias" in training_type:
+                    self.w_lora_bias = True
+
+                # specify the attn_processor for unet
+                lora_attn_procs = self._set_attn_processor(
+                    self.unet, 
+                    self_attn_name="attn1.processor",
+                    self_lora_type=self.cfg.self_lora_type,
+                    cross_lora_type=self.cfg.cross_lora_type
+                )
+                self.unet.set_attn_processor(lora_attn_procs)
+                # update the trainable parameters
+                trainable_params.update(self.unet.attn_processors)
+
+                # specify the attn_processor for vae
+                lora_attn_procs = self._set_attn_processor(
+                    self.vae, 
+                    self_attn_name="processor",
+                    self_lora_type=self.cfg.vae_attn_type, # hard-coded for vae 
+                    cross_lora_type="vanilla"
+                )
+                self.vae.set_attn_processor(lora_attn_procs)
+                # update the trainable parameters
+                trainable_params.update(self.vae.attn_processors)
+            else:
+                raise NotImplementedError("The training type is not supported.")
+
+            if "locon" in training_type:
+                # parse the rank from the training type, with the template "locon_rank_{}"
+                rank = re.search(r"locon_rank_(\d+)", training_type).group(1)
+                self.locon_rank = int(rank)
+
+                # if the finetuning is with bias
+                self.w_locon_bias = False
+                if "with_bias" in training_type:
+                    self.w_locon_bias = True
+
+                # specify the conv_processor for unet
+                locon_procs = self._set_conv_processor(
+                    self.unet,
+                    locon_type=self.cfg.locon_type
+                )
+
+                # update the trainable parameters
+                trainable_params.update(locon_procs)
+
+                # specify the conv_processor for vae
+                locon_procs = self._set_conv_processor(
+                    self.vae,
+                    locon_type="vanilla_v1", # hard-coded for vae decoder
+                )
+                # update the trainable parameters
+                trainable_params.update(locon_procs)
+            else:
+                raise NotImplementedError("The training type is not supported.")
+
+            # overwrite the outconv
+            # conv_out_orig = self.vae.decoder.conv_out
+            conv_out_new = nn.Conv2d(
+                in_channels=128, # conv_out_orig.in_channels, hard-coded
+                out_channels=self.cfg.output_dim, kernel_size=3, padding=1
             )
+
             # update the trainable parameters
-            trainable_params.update(locon_procs)
-        else:
-            raise NotImplementedError("The training type is not supported.")
+            self.vae.decoder.conv_out = conv_out_new
+            trainable_params["vae.decoder.conv_out"] = conv_out_new
 
-        # overwrite the outconv
-        # conv_out_orig = self.vae.decoder.conv_out
-        conv_out_new = nn.Conv2d(
-            in_channels=128, # conv_out_orig.in_channels, hard-coded
-            out_channels=self.cfg.output_dim, kernel_size=3, padding=1
-        )
-
-        # update the trainable parameters
-        self.vae.decoder.conv_out = conv_out_new
-        trainable_params["vae.decoder.conv_out"] = conv_out_new
-
-        # save the trainable parameters
-        self.peft_layers = AttnProcsLayers(trainable_params).to(self.device)
-        self.peft_layers._load_state_dict_pre_hooks.clear()
-        self.peft_layers._state_dict_hooks.clear()    
+            # save the trainable parameters
+            self.peft_layers = AttnProcsLayers(trainable_params).to(self.device)
+            self.peft_layers._load_state_dict_pre_hooks.clear()
+            self.peft_layers._state_dict_hooks.clear()    
 
         # hard-coded for now
         self.num_planes = 6
 
+        if self.cfg.prompt_bias:
+            self.prompt_bias = nn.Parameter(torch.zeros(self.num_planes, 77, 1024))
+
+    @property
+    def unet(self):
+        return self.submodules.unet
+
+    @property
+    def vae(self):
+        return self.submodules.vae
 
     def _set_conv_processor(
         self,
@@ -855,6 +886,8 @@ class OneStepTriplaneDualStableDiffusion(nn.Module):
                 key_name = f"{_name}.lora_layer"
                 locon_procs[key_name] = locon_proc
         return locon_procs
+
+
 
     def _set_attn_processor(
             self, 
@@ -898,7 +931,12 @@ class OneStepTriplaneDualStableDiffusion(nn.Module):
                 )
         return lora_attn_procs
     
-
+    def forward(
+        self,
+        text_embed,
+        styles,
+    ):
+        return None
     def forward_denoise(
         self, 
         text_embed,
@@ -941,4 +979,3 @@ class OneStepTriplaneDualStableDiffusion(nn.Module):
         triplane = triplane.view(-1, self.num_planes, self.cfg.output_dim, *triplane.shape[-2:])
 
         return triplane
-

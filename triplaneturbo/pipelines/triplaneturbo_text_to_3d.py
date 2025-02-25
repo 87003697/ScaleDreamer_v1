@@ -1,19 +1,18 @@
 import os
 import re
 import json
+from tqdm import tqdm
+
 import torch
-import torch.nn as nn
 from typing import *
 from dataclasses import dataclass, field
-
 from diffusers import StableDiffusionPipeline
-from diffusers.configuration_utils import FrozenDict
-from diffusers.loaders import AttnProcsLayers
 
 from .base import Pipeline
 from ..models.geometry import StableDiffusionTriplaneDualAttention
+from ..utils.mesh_exporter import isosurface, DiffMarchingCubeHelper
 
-from tqdm import tqdm
+from diffusers.loaders import AttnProcsLayers
 
 @dataclass
 class TriplaneTurboTextTo3DPipelineConfig:
@@ -67,6 +66,8 @@ class TriplaneTurboTextTo3DPipelineConfig:
         }
     )
 
+    isosurface_deformable_grid: bool = True
+
     @classmethod
     def from_pretrained(cls, pretrained_path: str) -> "TriplaneTurboTextTo3DPipelineConfig":
         """Load config from pretrained path"""
@@ -96,6 +97,9 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         self.geometry = geometry
         self.base_pipeline = base_pipeline
         self.sample_scheduler = sample_scheduler
+        self.isosurface_helper = DiffMarchingCubeHelper(
+            resolution=128, # hard-coded for now
+        )
 
         self.models = {
             "geometry": geometry,
@@ -147,11 +151,80 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
                 vae=base_pipeline.vae,
                 unet=base_pipeline.unet,
             )
+
         # and load adapter weights
         if pretrained_model_name_or_path.endswith(".pth"):
             state_dict = torch.load(pretrained_model_name_or_path)
-            _, unused = geometry.load_state_dict(state_dict, strict=False)
-            assert len(unused) == 0, f"Unused keys: {unused}"
+            new_state_dict = state_dict
+            # for key, values in state_dict.items():
+            #     if "deformation_network" in key:
+            #         print(key)
+
+
+            # # for key, values in state_dict.items():
+            # #     if "peft_layers" not in key:
+            # #         print(key)
+            # # _, unused = geometry.load_state_dict(state_dict, strict=False)
+            # loader = geometry.space_generator.peft_layers
+
+            # target_state_dict_keys = geometry.state_dict().keys()
+            # target_state_dict_keys = [key for key in target_state_dict_keys if "peft_layers" not in key]
+
+            # new_state_dict = {}
+            # for name, param in state_dict.items():
+            #     if name.split(".")[0] in ['bbox', 'sdf_network', 'feature_network', 'deformation_network']:
+            #         new_state_dict[name] = param
+            #         continue
+
+            #     # 'space_generator.peft_layers.layers.0.to_q_xy_lora_geo.down.weight'
+            #     num = int(name.split(".")[3]) 
+            #     # 'down_blocks.0.attentions.0.transformer_blocks.0.attn1.processor'
+
+            #     pass_flag = False
+            #     # attempt in unet
+            #     if not pass_flag:
+            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator.unet')
+            #         if new_name in target_state_dict_keys:
+            #             new_state_dict[new_name] = param
+            #             pass_flag = True
+            #             # # delete the candidate key from target_state_dict_keys
+            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
+
+            #     # attempt in vae
+            #     if not pass_flag:
+            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator.vae')
+            #         if new_name in target_state_dict_keys:
+            #             new_state_dict[new_name] = param
+            #             pass_flag = True
+            #             # # delete the candidate key from target_state_dict_keys
+            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
+
+            #     # attempt in the last layer of the vae
+            #     if not pass_flag:
+            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator')
+            #         if new_name in target_state_dict_keys:
+            #             new_state_dict[new_name] = param
+            #             pass_flag = True
+            #             # # delete the candidate key from target_state_dict_keys
+            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
+
+
+
+            #     # store the new state dict
+            #     if pass_flag:
+            #         new_state_dict[new_name] = param
+            #     else:
+            #         print(f"{name} not found in target state dict")
+                
+                # 'space_generator.unet.up_blocks.2.attentions.0.transformer_blocks.0.attn1.processor.to_out_xz_lora_tex.down.weight'
+            # new_state_dict.update(state_dict)
+            _, unused = geometry.load_state_dict(new_state_dict, strict=False)
+            print(f"Unused keys: {unused}")
+
+
+
+            # geometry.space_generator.unet.load_attn_procs(state_dict)
+            # assert len(unused) == 0, f"Unused keys: {unused}"
         else:
             raise ValueError(f"Unknown pretrained model name or path: {pretrained_model_name_or_path}")
 
@@ -226,9 +299,11 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
                 generator=generator,
                 device=self.device,
             )
-        
+        # load the latents
+        latents = torch.load("latents.pth")
+
         # Process text prompt through geometry module
-        text_embeddings, _ = self.encode_prompt(prompt, self.device, num_results_per_prompt)
+        text_embed, _ = self.encode_prompt(prompt, self.device, num_results_per_prompt)
         
         # Run diffusion process
         # Set up timesteps for sampling
@@ -237,40 +312,50 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
             num_inference_steps
         )
 
-        # Run diffusion process
-        for i, t in tqdm(enumerate(timesteps)):
-            # Scale model input
-            noisy_latent_input = self.sample_scheduler.scale_model_input(
-                latents, 
-                t
+
+        with torch.no_grad():
+            # Run diffusion process
+            for i, t in tqdm(enumerate(timesteps)):
+                # Scale model input
+                noisy_latent_input = self.sample_scheduler.scale_model_input(
+                    latents, 
+                    t
+                )
+
+                # Predict noise/sample
+                pred = self.geometry.denoise(
+                    noisy_input=noisy_latent_input,
+                    text_embed=text_embed,
+                    timestep=t.to(self.device),
+                )
+
+                # Update latents
+                results = self.sample_scheduler.step(pred, t, latents)
+                latents = results.prev_sample
+                latents_denoised = results.pred_original_sample
+
+            # Use final denoised latents
+            latents = latents_denoised
+            
+            # Generate final 3D representation
+            space_cache = self.geometry.decode(latents)
+
+            # Extract mesh from space cache
+            mesh = isosurface(
+                space_cache,
+                self.geometry.forward_field,
+                self.isosurface_helper,
             )
-
-            # Predict noise/sample
-            pred = self.geometry.denoise(
-                noisy_input=noisy_latent_input,
-                text_embed=text_embeddings,
-                timestep=t.to(self.device),
-            )
-
-            # Update latents
-            results = self.sample_scheduler.step(pred, t, latents)
-            latents = results.prev_sample
-            latents_denoised = results.pred_original_sample
-
-        # Use final denoised latents
-        latents = latents_denoised
-        
-        # Generate final 3D representation
-        space_cache = self.geometry.decode(latents)
 
         # decide output type based on return_dict
         if return_dict:
             return {
                 "space_cache": space_cache,
                 "latents": latents,
+                "mesh": mesh,
             }
         else:
-            return space_cache
+            return mesh
 
     def _set_timesteps(
         self,
