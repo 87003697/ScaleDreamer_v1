@@ -355,6 +355,36 @@ class StableDiffusionTriplaneDualAttention(nn.Module):
         # TODO: is this function correct?
         return field - threshold
 
+    def export(
+        self, 
+        points: Float[Tensor, "*N Di"], 
+        space_cache: Float[Tensor, "B 3 C//3 H W"],
+    **kwargs) -> Dict[str, Any]:
+    
+        # TODO: is this function correct?
+        out: Dict[str, Any] = {}
+        if self.cfg.n_feature_dims == 0:
+            return out
+
+        orig_shape = points.shape
+        points = points.view(1, -1, 3)
+
+        # assume the batch size is 1
+        points_unscaled = points
+        points = self.rescale_points(points)
+
+        # sample from planes
+        _, enc_tex = self.interpolate_encodings(points, space_cache)
+        features = self.feature_network(enc_tex).view(
+            *points.shape[:-1], self.cfg.n_feature_dims
+        )
+        out.update(
+            {
+                "features": features.view(orig_shape[:-1] + (self.cfg.n_feature_dims,)) 
+            }
+        )
+        return out
+    
     def train(self, mode=True):
         super().train(mode)
         self.space_generator.train(mode)

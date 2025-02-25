@@ -9,7 +9,7 @@ from triplaneturbo.utils.mesh_exporter import export_obj
 
 
 # Initialize configuration and parameters
-prompt = "a bald eagle carved out of wood"
+prompt = "a beautiful girl"
 output_dir = "examples/output"
 adapter_name_or_path = "pretrained/triplane_turbo_sd_v1.pth"
 num_results_per_prompt = 1

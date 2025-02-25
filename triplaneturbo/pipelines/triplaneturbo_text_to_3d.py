@@ -10,9 +10,10 @@ from diffusers import StableDiffusionPipeline
 
 from .base import Pipeline
 from ..models.geometry import StableDiffusionTriplaneDualAttention
-from ..utils.mesh_exporter import isosurface, DiffMarchingCubeHelper
+from ..utils.mesh_exporter import isosurface, colorize_mesh, DiffMarchingCubeHelper
 
 from diffusers.loaders import AttnProcsLayers
+from ..models.networks import get_activation
 
 @dataclass
 class TriplaneTurboTextTo3DPipelineConfig:
@@ -67,6 +68,8 @@ class TriplaneTurboTextTo3DPipelineConfig:
     )
 
     isosurface_deformable_grid: bool = True
+    isosurface_resolution: int = 160
+    color_activation: str = "sigmoid-mipnerf"
 
     @classmethod
     def from_pretrained(cls, pretrained_path: str) -> "TriplaneTurboTextTo3DPipelineConfig":
@@ -89,17 +92,21 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
     def __init__(
         self,
         geometry: StableDiffusionTriplaneDualAttention,
+        material: Callable,
         base_pipeline: StableDiffusionPipeline,
         sample_scheduler: Callable,
+        isosurface_helper: Callable,
         **kwargs,
     ):
         super().__init__()
         self.geometry = geometry
+        self.material = material
+
         self.base_pipeline = base_pipeline
+
         self.sample_scheduler = sample_scheduler
-        self.isosurface_helper = DiffMarchingCubeHelper(
-            resolution=128, # hard-coded for now
-        )
+        self.isosurface_helper = isosurface_helper
+
 
         self.models = {
             "geometry": geometry,
@@ -166,11 +173,20 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         else:
             raise ValueError(f"Unknown pretrained model name or path: {pretrained_model_name_or_path}")
 
+
+        # load material, convert to int
+        # material = lambda x: (256 * get_activation(config.color_activation)(x)).int()
+        material = get_activation(config.color_activation)
+
         # Load geometry model
         pipeline = cls(
             base_pipeline=base_pipeline,
             geometry=geometry,
             sample_scheduler=sample_scheduler,
+            material=material,
+            isosurface_helper=DiffMarchingCubeHelper(
+                resolution=config.isosurface_resolution,
+            ),
             **kwargs,
         )
         return pipeline
@@ -214,6 +230,7 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         generator: Optional[torch.Generator] = None,
         latents: Optional[torch.FloatTensor] = None,
         return_dict: bool = True,
+        colorize: bool = True,
         **kwargs,
     ):
         # Implementation similar to Zero123Pipeline
@@ -277,21 +294,29 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
             space_cache = self.geometry.decode(latents)
 
             # Extract mesh from space cache
-            mesh = isosurface(
+            mesh_list = isosurface(
                 space_cache,
                 self.geometry.forward_field,
                 self.isosurface_helper,
             )
+
+            if colorize:
+                mesh_list = colorize_mesh(
+                    space_cache,
+                    self.geometry.export,
+                    mesh_list,
+                    activation=self.material,
+                )
 
         # decide output type based on return_dict
         if return_dict:
             return {
                 "space_cache": space_cache,
                 "latents": latents,
-                "mesh": mesh,
+                "mesh": mesh_list,
             }
         else:
-            return mesh
+            return mesh_list
 
     def _set_timesteps(
         self,
@@ -313,3 +338,4 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         timesteps_delta = scheduler.config.num_train_timesteps - 1 - timesteps_orig.max()
         timesteps = timesteps_orig + timesteps_delta
         return timesteps
+

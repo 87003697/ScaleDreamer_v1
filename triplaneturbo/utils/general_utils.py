@@ -101,18 +101,4 @@ def sample_from_planes(plane_features, coordinates, mode='bilinear', padding_mod
         output_features = output_features.permute(0, 3, 2, 1).reshape(N, n_planes, M, C)
         output_features = output_features.permute(0, 2, 1, 3).reshape(N, M, n_planes*C)        
 
-    elif interpolate_feat in ["v3"]:
-        projected_coordinates = project_onto_planes(planes.to(coordinates), coordinates).unsqueeze(1)
-        plane_features = torch.sigmoid(plane_features[:, -1:, ...]) * plane_features[:, :-1, ...]
-        output_features = grid_sample(plane_features, projected_coordinates.float())
-        output_features = output_features.permute(0, 3, 2, 1).reshape(N, n_planes, M, C - 1)
-        output_features = output_features.sum(dim=1, keepdim=True).reshape(N, M, C - 1)
-
-    elif interpolate_feat in ["v4"]:
-        projected_coordinates = project_onto_planes(planes.to(coordinates), coordinates).unsqueeze(1)
-        plane_features =  torch.tanh(plane_features)
-        output_features = grid_sample(plane_features, projected_coordinates.float())
-        output_features = output_features.permute(0, 3, 2, 1).reshape(N, n_planes, M, C)
-        output_features = output_features.sum(dim=1, keepdim=True).reshape(N, M, C)
-
     return output_features.contiguous()

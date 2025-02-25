@@ -140,6 +140,48 @@ def isosurface(
         
     return mesh_list
 
+def colorize_mesh(
+    space_cache: Any,
+    export_fn: Callable,
+    mesh_list: List[Mesh],
+    activation: Callable,
+) -> List[Mesh]:
+    """Colorize the mesh using the geometry's export function and space cache.
+    
+    Args:
+        space_cache: The space cache containing feature information
+        export_fn: The export function from geometry that generates features
+        mesh_list: List of meshes to colorize
+        
+    Returns:
+        List[Mesh]: List of colorized meshes
+    """
+    # Process each mesh in the batch
+    for i, mesh in enumerate(mesh_list):
+        # Get vertex positions
+        points = mesh.v_pos[None, ...]  # Add batch dimension [1, N, 3]
+        
+        # Get the corresponding space cache slice for this mesh
+        if torch.is_tensor(space_cache):
+            space_cache_slice = space_cache[i:i+1]
+        elif isinstance(space_cache, dict):
+            space_cache_slice = {}
+            for key in space_cache.keys():
+                space_cache_slice[key] = [
+                    weight[i:i+1] for weight in space_cache[key]
+                ]
+        
+        # Export features for the vertices
+        out = export_fn(points, space_cache_slice)
+        
+        # Update vertex colors if features exist
+        if "features" in out:
+            features = out["features"].squeeze(0)  # Remove batch dim [N, C]
+            # Convert features to RGB colors
+            mesh._v_rgb = activation(features)  # Access private attribute directly
+            
+    return mesh_list
+
 class MeshExporter(SaverMixin):
     def __init__(self, save_dir="outputs"):
         self.save_dir = save_dir
@@ -156,7 +198,10 @@ class MeshExporter(SaverMixin):
             return x.detach().cpu().numpy()
         return x
 
-def export_obj(mesh: Mesh, save_path: str) -> List[str]:
+def export_obj(
+        mesh: Mesh, 
+        save_path: str
+    ) -> List[str]:
     """
     Export mesh data to OBJ file format.
     
@@ -175,8 +220,8 @@ def export_obj(mesh: Mesh, save_path: str) -> List[str]:
     save_paths = exporter.save_obj(
         os.path.basename(save_path),
         mesh,
-        save_mat=mesh.v_rgb is not None,
-        save_normal=False,
+        save_mat=None,
+        save_normal=mesh.v_nrm is not None,
         save_uv=False,
         save_vertex_color=mesh.v_rgb is not None,
     )
