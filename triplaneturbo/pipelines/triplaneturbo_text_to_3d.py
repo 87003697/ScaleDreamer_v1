@@ -152,79 +152,17 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
                 unet=base_pipeline.unet,
             )
 
+        # no gradient for geometry
+        for param in geometry.parameters():
+            param.requires_grad = False
+
         # and load adapter weights
         if pretrained_model_name_or_path.endswith(".pth"):
             state_dict = torch.load(pretrained_model_name_or_path)
             new_state_dict = state_dict
-            # for key, values in state_dict.items():
-            #     if "deformation_network" in key:
-            #         print(key)
-
-
-            # # for key, values in state_dict.items():
-            # #     if "peft_layers" not in key:
-            # #         print(key)
-            # # _, unused = geometry.load_state_dict(state_dict, strict=False)
-            # loader = geometry.space_generator.peft_layers
-
-            # target_state_dict_keys = geometry.state_dict().keys()
-            # target_state_dict_keys = [key for key in target_state_dict_keys if "peft_layers" not in key]
-
-            # new_state_dict = {}
-            # for name, param in state_dict.items():
-            #     if name.split(".")[0] in ['bbox', 'sdf_network', 'feature_network', 'deformation_network']:
-            #         new_state_dict[name] = param
-            #         continue
-
-            #     # 'space_generator.peft_layers.layers.0.to_q_xy_lora_geo.down.weight'
-            #     num = int(name.split(".")[3]) 
-            #     # 'down_blocks.0.attentions.0.transformer_blocks.0.attn1.processor'
-
-            #     pass_flag = False
-            #     # attempt in unet
-            #     if not pass_flag:
-            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator.unet')
-            #         if new_name in target_state_dict_keys:
-            #             new_state_dict[new_name] = param
-            #             pass_flag = True
-            #             # # delete the candidate key from target_state_dict_keys
-            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
-
-            #     # attempt in vae
-            #     if not pass_flag:
-            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator.vae')
-            #         if new_name in target_state_dict_keys:
-            #             new_state_dict[new_name] = param
-            #             pass_flag = True
-            #             # # delete the candidate key from target_state_dict_keys
-            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
-
-            #     # attempt in the last layer of the vae
-            #     if not pass_flag:
-            #         new_name = name.replace(f"layers.{num}", loader.mapping[num]).replace('space_generator.peft_layers', 'space_generator')
-            #         if new_name in target_state_dict_keys:
-            #             new_state_dict[new_name] = param
-            #             pass_flag = True
-            #             # # delete the candidate key from target_state_dict_keys
-            #             # del target_state_dict_keys[target_state_dict_keys.index(new_name)]
-
-
-
-            #     # store the new state dict
-            #     if pass_flag:
-            #         new_state_dict[new_name] = param
-            #     else:
-            #         print(f"{name} not found in target state dict")
-                
-                # 'space_generator.unet.up_blocks.2.attentions.0.transformer_blocks.0.attn1.processor.to_out_xz_lora_tex.down.weight'
-            # new_state_dict.update(state_dict)
             _, unused = geometry.load_state_dict(new_state_dict, strict=False)
-            print(f"Unused keys: {unused}")
-
-
-
-            # geometry.space_generator.unet.load_attn_procs(state_dict)
-            # assert len(unused) == 0, f"Unused keys: {unused}"
+            if len(unused) > 0:
+                print(f"Unused keys: {unused}")
         else:
             raise ValueError(f"Unknown pretrained model name or path: {pretrained_model_name_or_path}")
 
@@ -295,12 +233,10 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         # Generate latents if not provided
         if latents is None:
             latents = torch.randn(
-                (batch_size * 6, 4, 64, 64), # hard-coded for now
+                (batch_size * 6, 4, 32, 32), # hard-coded for now
                 generator=generator,
                 device=self.device,
             )
-        # load the latents
-        latents = torch.load("latents.pth")
 
         # Process text prompt through geometry module
         text_embed, _ = self.encode_prompt(prompt, self.device, num_results_per_prompt)
