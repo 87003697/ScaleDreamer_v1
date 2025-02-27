@@ -1,4 +1,4 @@
-name: "DE+MJ__ns-100-p__sd-0.1-5-v3_mv-10-v1_rd-0.1-20-v2__eik_1-0_spars_1-0_eps_01_mesh-001_001"
+name: "DE+MJ__ns-100-p__sd-0.1-5-v3_mv-10-v1_rd-20-v2__eik_1-0_spars_1-0_eps_01_mesh-001_001"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_19"
 seed: 0
@@ -191,7 +191,7 @@ system:
     plus_schedule: "linear"
     # the following are specific to the combination of ASD with MV and SD
     mv_plus_random: true
-    mv_plus_ratio: 0.
+    mv_plus_ratio: 0.1
     rd_plus_random: true
     rd_plus_ratio: 0.1
     sd_plus_random: true
