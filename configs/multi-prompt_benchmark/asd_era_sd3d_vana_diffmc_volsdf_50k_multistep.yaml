@@ -1,4 +1,4 @@
-name: "asd_era_sd3d_seqtu_diffmc_volsdf_50k_multistep"
+name: "asd_era_sd3d_vana_diffmc_volsdf_50k_multistep"
 tag: "${rmspace:${data.image_library},_}"
 exp_root_dir: "outputs_13"
 seed: 0
@@ -169,7 +169,7 @@ system:
     era3d_plus_ratio: 0.
 
     # general settings
-    era3d_min_step_percent: [0, 0.90, 0.02, 20000]
+    era3d_min_step_percent: [0, 0.97, 0.02, 5000]
     era3d_max_step_percent: 0.98
     era3d_guidance_scale_color: 3.
     era3d_guidance_scale_normal: 5.
