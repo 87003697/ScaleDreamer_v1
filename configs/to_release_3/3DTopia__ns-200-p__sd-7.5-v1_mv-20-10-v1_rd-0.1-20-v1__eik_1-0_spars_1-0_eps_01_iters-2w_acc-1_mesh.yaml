@@ -1,4 +1,4 @@
-name: "3DTopia__ns-200-p__sd-7.5-v1_mv-20-10-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh"
+name: "3DTopia__ns-200-p__sd-7.5-v1_mv-20-10-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_01_iters-2w_acc-1_mesh"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_to_release_3"
 seed: 0
@@ -162,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: 10 #7.5
+    mv_guidance_scale: [0, 20., 10., 20000]
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
@@ -201,7 +201,7 @@ system:
     gradient_checkpoint: true
     auto_grad: true
 
-    eps: 0.01
+    eps: 0.1
 
 
 
