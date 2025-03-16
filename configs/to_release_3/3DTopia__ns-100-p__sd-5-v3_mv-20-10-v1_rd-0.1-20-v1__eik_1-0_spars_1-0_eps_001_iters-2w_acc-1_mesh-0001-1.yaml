@@ -1,4 +1,4 @@
-name: "3DTopia__ns-200-p__sd-7.5-v1_mv-10-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh"
+name: "3DTopia__ns-100-p__sd-5-v3_mv-20-10-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh-0001-1"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_to_release_3"
 seed: 0
@@ -127,8 +127,8 @@ system:
     enable_bg_rays: true
     allow_empty_flag: false
 
-    sdf_grad_shrink: 0. # sdf is not optimized w.r.t. the rasterizer
-    def_grad_shrink: 1. # def is optimized, but start from as small as 0
+    sdf_grad_shrink: 0.001 # sdf is not optimized w.r.t. the rasterizer
+    def_grad_shrink: 0.1 # def is optimized, but start from as small as 0
 
 
   renderer_2nd_type: patch-renderer
@@ -138,7 +138,7 @@ system:
       radius: ${system.geometry.radius}
       use_volsdf: false
       trainable_variance: false # important!
-      learned_variance_init: 0.5298  # 0.5298 = log(200) / 10, 200 is the most common variance across the prompts
+      learned_variance_init: 0.4605  # 0.4605 = log(100) / 10, 100 is the most common variance across the prompts
       
       rgb_grad_shrink: [0, 1, 0.01, 20000]
 
@@ -162,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: 0 #7.5
+    mv_guidance_scale: [0, 20., 10., 20000]
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
@@ -179,10 +179,10 @@ system:
 
     # the following are specific to SD
     sd_min_step_percent: [0, 0.5, 0.02, 20000]
-    sd_max_step_percent: 0.98
+    sd_max_step_percent: [0, 0.98, 0.5, 20000]
     sd_model_name_or_path: "pretrained/stable-diffusion-2-1-base"
     sd_weight: 1
-    sd_guidance_scale: 7.5
+    sd_guidance_scale: 5.
     sd_weighting_strategy: "dmd"
     sd_oppo_side: true
 
