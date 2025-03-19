@@ -15,6 +15,8 @@ from ..utils.mesh_exporter import isosurface, colorize_mesh, DiffMarchingCubeHel
 from diffusers.loaders import AttnProcsLayers
 from ..models.networks import get_activation
 
+from time import time
+
 @dataclass
 class TriplaneTurboTextTo3DPipelineConfig:
     """Configuration for TriplaneTurboTextTo3DPipeline"""
@@ -236,6 +238,7 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         # Implementation similar to Zero123Pipeline
         # Reference code from: https://github.com/zero123/zero123-diffusers
         
+        start_time = time()
         # Validate inputs
         if isinstance(prompt, str):
             batch_size = 1
@@ -308,6 +311,9 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
                     activation=self.material,
                 )
 
+        end_time = time()
+        print(f"Time taken: {end_time - start_time} seconds")
+        
         # decide output type based on return_dict
         if return_dict:
             return {
