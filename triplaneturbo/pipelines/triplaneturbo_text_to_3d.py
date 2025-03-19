@@ -16,6 +16,7 @@ from diffusers.loaders import AttnProcsLayers
 from ..models.networks import get_activation
 
 from time import time
+from torch.cuda.amp import autocast
 
 @dataclass
 class TriplaneTurboTextTo3DPipelineConfig:
@@ -141,6 +142,7 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
         # load base pipeline
         base_pipeline = StableDiffusionPipeline.from_pretrained(
             config.base_model_name_or_path,
+            torch_dtype=torch.float16,
             **kwargs,
         )
 
@@ -167,8 +169,11 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
 
         # and load adapter weights
         if pretrained_model_name_or_path.endswith(".pth"):
-            state_dict = torch.load(pretrained_model_name_or_path)
-            new_state_dict = state_dict
+            state_dict = torch.load(pretrained_model_name_or_path)["state_dict"]
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                new_key = key.replace("geometry.", "")
+                new_state_dict[new_key] = value
             _, unused = geometry.load_state_dict(new_state_dict, strict=False)
             if len(unused) > 0:
                 print(f"Unused keys: {unused}")
@@ -268,52 +273,52 @@ class TriplaneTurboTextTo3DPipeline(Pipeline):
             num_inference_steps
         )
 
+        with autocast():
+            with torch.no_grad():
+                # Run diffusion process
+                for i, t in tqdm(enumerate(timesteps)):
+                    # Scale model input
+                    noisy_latent_input = self.sample_scheduler.scale_model_input(
+                        latents, 
+                        t
+                    )
 
-        with torch.no_grad():
-            # Run diffusion process
-            for i, t in tqdm(enumerate(timesteps)):
-                # Scale model input
-                noisy_latent_input = self.sample_scheduler.scale_model_input(
-                    latents, 
-                    t
-                )
+                    # Predict noise/sample
+                    pred = self.geometry.denoise(
+                        noisy_input=noisy_latent_input,
+                        text_embed=text_embed,
+                        timestep=t.to(self.device),
+                    )
 
-                # Predict noise/sample
-                pred = self.geometry.denoise(
-                    noisy_input=noisy_latent_input,
-                    text_embed=text_embed,
-                    timestep=t.to(self.device),
-                )
+                    # Update latents
+                    results = self.sample_scheduler.step(pred, t, latents)
+                    latents = results.prev_sample
+                    latents_denoised = results.pred_original_sample
 
-                # Update latents
-                results = self.sample_scheduler.step(pred, t, latents)
-                latents = results.prev_sample
-                latents_denoised = results.pred_original_sample
+                # Use final denoised latents
+                latents = latents_denoised
+                
+                # Generate final 3D representation
+                space_cache = self.geometry.decode(latents)
 
-            # Use final denoised latents
-            latents = latents_denoised
-            
-            # Generate final 3D representation
-            space_cache = self.geometry.decode(latents)
-
-            # Extract mesh from space cache
-            mesh_list = isosurface(
-                space_cache,
-                self.geometry.forward_field,
-                self.isosurface_helper,
-            )
-
-            if colorize:
-                mesh_list = colorize_mesh(
+                # Extract mesh from space cache
+                mesh_list = isosurface(
                     space_cache,
-                    self.geometry.export,
-                    mesh_list,
-                    activation=self.material,
+                    self.geometry.forward_field,
+                    self.isosurface_helper,
                 )
+
+                if colorize:
+                    mesh_list = colorize_mesh(
+                        space_cache,
+                        self.geometry.export,
+                        mesh_list,
+                        activation=self.material,
+                    )
 
         end_time = time()
         print(f"Time taken: {end_time - start_time} seconds")
-        
+
         # decide output type based on return_dict
         if return_dict:
             return {
