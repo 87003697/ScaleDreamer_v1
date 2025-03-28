@@ -25,6 +25,11 @@ def create_scrolling_video_wall(video_paths, output_path, fps=30, duration=30, r
     videos_per_row = (width // video_size) + 2  # 多放两个用于滚动
     rows = 2  # 分两行显示
     
+    # 计算垂直居中对齐的偏移量
+    row_height = video_size
+    total_video_height = rows * row_height
+    vertical_offset = (height - total_video_height) // 2  # 垂直居中
+    
     total_frames = int(fps * duration)
     scroll_width = len(video_paths) * video_size  # 所有视频拼接的总宽度
     
@@ -104,12 +109,12 @@ def create_scrolling_video_wall(video_paths, output_path, fps=30, duration=30, r
         scroll_offset = (frame_idx / total_frames) * scroll_width
         scroll_offset %= scroll_width  # 循环滚动
         
-        # 创建一个空白画布
-        canvas = np.zeros((height, width, 3), dtype=np.uint8)
+        # 创建一个白色画布 (而不是黑色)
+        canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
         
         # 填充两行视频
         for row in range(rows):
-            row_y = row * video_size
+            row_y = row * video_size + vertical_offset  # 应用垂直居中偏移
             
             # 如果第二行，反向滚动
             if row == 1:
