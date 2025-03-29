@@ -503,9 +503,10 @@ class SaverMixin:
         map_Pr: Optional[Float[Tensor, "H W 1"]] = None,
         map_format: str = "jpg",
     ) -> List[str]:
-        save_paths: List[str] = []
+
         if not filename.endswith(".obj"):
             filename += ".obj"
+        save_path = self.get_save_path(filename)
         v_pos, t_pos_idx = self.convert_data(mesh.v_pos), self.convert_data(
             mesh.t_pos_idx
         )
@@ -518,35 +519,82 @@ class SaverMixin:
             )
         if save_vertex_color:
             v_rgb = self.convert_data(mesh.v_rgb)
-        matname, mtllib = None, None
-        if save_mat:
-            matname = "default"
-            mtl_filename = filename.replace(".obj", ".mtl")
-            mtllib = os.path.basename(mtl_filename)
-            mtl_save_paths = self._save_mtl(
-                mtl_filename,
-                matname,
-                map_Kd=self.convert_data(map_Kd),
-                map_Ks=self.convert_data(map_Ks),
-                map_Bump=self.convert_data(map_Bump),
-                map_Pm=self.convert_data(map_Pm),
-                map_Pr=self.convert_data(map_Pr),
-                map_format=map_format,
-            )
-            save_paths += mtl_save_paths
-        obj_save_path = self._save_obj(
-            filename,
-            v_pos,
-            t_pos_idx,
-            v_nrm=v_nrm,
-            v_tex=v_tex,
-            t_tex_idx=t_tex_idx,
-            v_rgb=v_rgb,
-            matname=matname,
-            mtllib=mtllib,
+            
+        # use trimesh to save obj
+        mesh = trimesh.Trimesh(
+            vertices=v_pos,
+            faces=t_pos_idx,
+            vertex_normals=v_nrm,
+            vertex_colors=v_rgb,
+            visual=trimesh.visual.TextureVisuals(
+                uv=v_tex,
+                face_uv=t_tex_idx
+            ) if save_uv else None
         )
-        save_paths.append(obj_save_path)
-        return save_paths
+
+        # save the mesh to obj
+        mesh.export(save_path)
+        return [save_path]
+        
+    # def save_obj(
+    #     self,
+    #     filename: str,
+    #     mesh: Mesh,
+    #     save_mat: bool = False,
+    #     save_normal: bool = False,
+    #     save_uv: bool = False,
+    #     save_vertex_color: bool = False,
+    #     map_Kd: Optional[Float[Tensor, "H W 3"]] = None,
+    #     map_Ks: Optional[Float[Tensor, "H W 3"]] = None,
+    #     map_Bump: Optional[Float[Tensor, "H W 3"]] = None,
+    #     map_Pm: Optional[Float[Tensor, "H W 1"]] = None,
+    #     map_Pr: Optional[Float[Tensor, "H W 1"]] = None,
+    #     map_format: str = "jpg",
+    # ) -> List[str]:
+    #     save_paths: List[str] = []
+    #     if not filename.endswith(".obj"):
+    #         filename += ".obj"
+    #     v_pos, t_pos_idx = self.convert_data(mesh.v_pos), self.convert_data(
+    #         mesh.t_pos_idx
+    #     )
+    #     v_nrm, v_tex, t_tex_idx, v_rgb = None, None, None, None
+    #     if save_normal:
+    #         v_nrm = self.convert_data(mesh.v_nrm)
+    #     if save_uv:
+    #         v_tex, t_tex_idx = self.convert_data(mesh.v_tex), self.convert_data(
+    #             mesh.t_tex_idx
+    #         )
+    #     if save_vertex_color:
+    #         v_rgb = self.convert_data(mesh.v_rgb)
+    #     matname, mtllib = None, None
+    #     if save_mat:
+    #         matname = "default"
+    #         mtl_filename = filename.replace(".obj", ".mtl")
+    #         mtllib = os.path.basename(mtl_filename)
+    #         mtl_save_paths = self._save_mtl(
+    #             mtl_filename,
+    #             matname,
+    #             map_Kd=self.convert_data(map_Kd),
+    #             map_Ks=self.convert_data(map_Ks),
+    #             map_Bump=self.convert_data(map_Bump),
+    #             map_Pm=self.convert_data(map_Pm),
+    #             map_Pr=self.convert_data(map_Pr),
+    #             map_format=map_format,
+    #         )
+    #         save_paths += mtl_save_paths
+    #     obj_save_path = self._save_obj(
+    #         filename,
+    #         v_pos,
+    #         t_pos_idx,
+    #         v_nrm=v_nrm,
+    #         v_tex=v_tex,
+    #         t_tex_idx=t_tex_idx,
+    #         v_rgb=v_rgb,
+    #         matname=matname,
+    #         mtllib=mtllib,
+    #     )
+    #     save_paths.append(obj_save_path)
+    #     return save_paths
 
     def _save_obj(
         self,

@@ -23,11 +23,11 @@
 #      data.image_root_dir="datasets/sdxl_3d_animation_v1_7" \
 #      name="asd_era_sd3d_diffmc_volsdf_50k_multistep_exp2"
 
-CUDA_VISIBLE_DEVICES=4,5,6,7  python launch.py \
+CUDA_VISIBLE_DEVICES=4,7  python launch.py \
     --config configs/multi-prompt_benchmark/asd_era_sd3d_seqtu_diffmc_volsdf_50k_multistep.yaml \
     --train \
-     data.image_library="sdxl_3d_animation_v2_2056_image_library" \
-     data.image_root_dir="datasets/sdxl_3d_animation_v2_2056"
+     data.image_library="layerdiffuse_v1_7488_image_library" \
+     data.image_root_dir="datasets/layerdiffuse_v1_7488"
 
 # CUDA_VISIBLE_DEVICES=7  python launch.py \
 #     --config configs/multi-prompt_benchmark/asd_era_sd3d_seqtu_diffmc_volsdf_50k_multistep.yaml \
