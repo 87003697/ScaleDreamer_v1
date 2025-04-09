@@ -1,4 +1,4 @@
-name: "3DTopia__ns-100-p__sd-5-v1_mv-20-10-v1_rd-20-v1__eik_1-0_spars_1-0_eps_01_iters-2w_acc-1"
+name: "3DTopia__ns-100-p__sd-5-v1_mv-20-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh-001-001"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_to_release_4"
 seed: 0
@@ -127,8 +127,8 @@ system:
     enable_bg_rays: true
     allow_empty_flag: false
 
-    sdf_grad_shrink: 0. # sdf is not optimized w.r.t. the rasterizer
-    def_grad_shrink: 1. # def is optimized, but start from as small as 0
+    sdf_grad_shrink: 0.01 # sdf is not optimized w.r.t. the rasterizer
+    def_grad_shrink: 0.01 # def is optimized, but start from as small as 0
 
 
   renderer_2nd_type: patch-renderer
@@ -162,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: [0, 20., 10., 20000]
+    mv_guidance_scale: 20.
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
@@ -193,7 +193,7 @@ system:
     mv_plus_random: true
     mv_plus_ratio: 0.
     rd_plus_random: true
-    rd_plus_ratio: 0.
+    rd_plus_ratio: 0.1
     sd_plus_random: true
     sd_plus_ratio: 0.
 
@@ -201,7 +201,7 @@ system:
     gradient_checkpoint: true
     auto_grad: true
 
-    eps: 0.1
+    eps: 0.01
 
 
 
