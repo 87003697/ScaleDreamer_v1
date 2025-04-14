@@ -22,7 +22,7 @@ torchrun \
     --master_port=$port \
     --master_addr=$HOST_NODE_ADDR \
     launch.py \
-        --config configs/to_release_4/3DTopia__ns-100-p__sd-5-v1_mv-20-v1_rd-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh-001-001.yaml  \
+        --config configs/to_release_4/3DTopia__ns-100-p__sd-5-v1_mv-20-v1_rd-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh-01-01.yaml  \
         --train \
         trainer.num_nodes=$2 \
         data.prompt_library="DALLE_Midjourney_1313928_prompt_library" \
