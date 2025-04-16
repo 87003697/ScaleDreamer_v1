@@ -162,7 +162,7 @@ system:
     mv_model_name_or_path: "sd-v2.1-base-4view"
     mv_ckpt_path: "pretrained/sd-v2.1-base-4view.pt" 
     mv_weight: 1.
-    mv_guidance_scale: 20.
+    mv_guidance_scale: [0, 20., 10., 20000]
     mv_weighting_strategy: "dmd"
 
     # the following are specific to RD
@@ -171,7 +171,7 @@ system:
     rd_model_name_or_path: "nd-mv"
     rd_ckpt_path: "pretrained/nd_mv_ema.ckpt"
     rd_weight: 1.
-    rd_guidance_scale: [0, 20., 10., 20000]
+    rd_guidance_scale: 20
     rd_weighting_strategy: "dmd"
     cam_method: "rel_x2" # "", "rel" or ""
 
