@@ -56,6 +56,17 @@ cd  $CONDA_PREFIX/lib
 ln -s  /usr/lib/x86_64-linux-gnu/libcuda.so ./
 cd <your repo directory>
 ```
+
+- Install CUDA KNN extension for point-based rendering:
+
+```sh
+cd custom/primiturbo/extern/knn
+python build_ext.py  # Compile the CUDA KNN extension
+python setup.py install  # Install the extension
+cd ../../../../
+```
+
+
 </details>
 
 <details>
