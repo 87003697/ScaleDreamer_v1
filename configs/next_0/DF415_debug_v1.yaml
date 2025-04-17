@@ -133,27 +133,44 @@ system:
     def_grad_shrink: 0.1 # def is optimized, but start from as small as 0
 
 
-  renderer_2nd_type: patch-renderer
+  renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
-    base_renderer_type: generative-space-volsdf-volume-renderer
-    base_renderer:
-      radius: ${system.geometry.radius}
-      use_volsdf: false
-      trainable_variance: false # important!
-      learned_variance_init: 0.4605  # 0.4605 = log(100) / 10, 100 is the most common variance across the prompts
+    radius: ${system.geometry.radius}
+    use_volsdf: false
+    trainable_variance: false # important!
+    learned_variance_init: 0.4605  # 0.4605 = log(100) / 10, 100 is the most common variance across the prompts
+    
+    rgb_grad_shrink: [0, 1, 0.01, 20000]
+
+    estimator: importance
+    num_samples_per_ray: 64
+    num_samples_per_ray_importance: 128
+
+    near_plane: 0.1
+    far_plane: 4.0
+    train_chunk_size: 0 #100000
+
+  # renderer_2nd_type: patch-renderer
+  # renderer_2nd:
+  #   base_renderer_type: generative-space-volsdf-volume-renderer
+  #   base_renderer:
+  #     radius: ${system.geometry.radius}
+  #     use_volsdf: false
+  #     trainable_variance: false # important!
+  #     learned_variance_init: 0.4605  # 0.4605 = log(100) / 10, 100 is the most common variance across the prompts
       
-      rgb_grad_shrink: [0, 1, 0.01, 20000]
+  #     rgb_grad_shrink: [0, 1, 0.01, 20000]
 
-      estimator: importance
-      num_samples_per_ray: 64
-      num_samples_per_ray_importance: 128
+  #     estimator: importance
+  #     num_samples_per_ray: 64
+  #     num_samples_per_ray_importance: 128
 
-      near_plane: 0.1
-      far_plane: 4.0
-      train_chunk_size: 0 #100000
-    patch_size: 64  # 64 * 64 = 4096
-    global_downsample: 2 # 128 / 2 ~= 64, 64 * 64 = 4096, 
-    # 4096 + 4096 = 8192 < 128 * 128
+  #     near_plane: 0.1
+  #     far_plane: 4.0
+  #     train_chunk_size: 0 #100000
+  #   patch_size: 64  # 64 * 64 = 4096
+  #   global_downsample: 2 # 128 / 2 ~= 64, 64 * 64 = 4096, 
+  #   # 4096 + 4096 = 8192 < 128 * 128
 
   guidance_type: "richdreamer-mvdream-stablediffusion-asynchronous-score-distillation-guidance"
   guidance:
