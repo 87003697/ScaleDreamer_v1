@@ -129,9 +129,8 @@ system:
     enable_bg_rays: true
     allow_empty_flag: false
 
-    sdf_grad_shrink: 0.1 # sdf is not optimized w.r.t. the rasterizer
-    def_grad_shrink: 0.1 # def is optimized, but start from as small as 0
-
+    sdf_grad_shrink: 0. # sdf is not optimized w.r.t. the rasterizer
+    def_grad_shrink: 1. # def is optimized, but start from as small as 0
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
