@@ -1,4 +1,4 @@
-name: "DF415_debug_v2"
+name: "3DTopia__ns-100-p__sd-5-v1_mv-20-10-v1_rd-0.1-20-v1__eik_1-0_spars_1-0_eps_001_iters-2w_acc-1_mesh-01-01__ddim"
 tag: "${rmspace:${data.prompt_library},_}"
 exp_root_dir: "outputs_next_v1"
 seed: 0
@@ -54,7 +54,7 @@ data:
     negative_prompt: ""
     use_local_text_embeddings: true
 
-system_type: "multiprompt-dual-renderer-multistep-generator-trd-system"
+system_type: "multiprompt-dual-renderer-multistep-generator-system"
 system:
   initialize_shape: false # #true #
   visualize_samples: false 
@@ -67,7 +67,7 @@ system:
   num_parts_training: 4 # TBD
   num_steps_training: 4 # TBD
   num_steps_sampling: 4
-  noise_scheduler: "ddpm" 
+  noise_scheduler: "ddim" 
   sample_scheduler: "ddim" 
   noise_addition: "gaussian" # TBD, any of "gaussian", "zero", "pred"
 
@@ -129,8 +129,9 @@ system:
     enable_bg_rays: true
     allow_empty_flag: false
 
-    sdf_grad_shrink: 0. # sdf is not optimized w.r.t. the rasterizer
-    def_grad_shrink: 1. # def is optimized, but start from as small as 0
+    sdf_grad_shrink: 0.1 # sdf is not optimized w.r.t. the rasterizer
+    def_grad_shrink: 0.1 # def is optimized, but start from as small as 0
+
 
   renderer_2nd_type: generative-space-volsdf-volume-renderer
   renderer_2nd:
@@ -211,7 +212,7 @@ system:
     mv_plus_random: true
     mv_plus_ratio: 0.
     rd_plus_random: true
-    rd_plus_ratio: 0.
+    rd_plus_ratio: 0.1
     sd_plus_random: true
     sd_plus_ratio: 0.
 
@@ -219,7 +220,7 @@ system:
     gradient_checkpoint: true
     auto_grad: true
 
-    eps: 0.1
+    eps: 0.01
 
 
 
@@ -271,16 +272,16 @@ system:
 trainer:
   max_steps: 500000
   log_every_n_steps: 1
-  num_sanity_val_steps: 1
-  # val_check_interval: 2
-  check_val_every_n_epoch: 5
+  num_sanity_val_steps: 0
+  val_check_interval: 5000
+  # check_val_every_n_epoch: 50
   enable_progress_bar: true
   precision: 32
-  strategy: "ddp"  #"ddp_find_unused_parameters_true" ##  # "deepspeed_stage_2"
+  strategy: "ddp" # "deepspeed_stage_2"
   # accumulate_grad_batches: 1 # > 1 is not supported
 
 checkpoint:
   save_last: true
   save_top_k: -1
-  # every_n_train_steps: ${trainer.val_check_interval}
-  every_n_epochs: ${trainer.check_val_every_n_epoch}
+  every_n_train_steps: ${trainer.val_check_interval}
+  # every_n_epochs: ${trainer.check_val_every_n_epoch}
