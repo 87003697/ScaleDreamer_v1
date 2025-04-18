@@ -54,7 +54,7 @@ data:
     negative_prompt: ""
     use_local_text_embeddings: true
 
-system_type: "multiprompt-dual-renderer-multistep-generator-system"
+system_type: "multiprompt-dual-renderer-multistep-generator-trd-system"
 system:
   initialize_shape: false # #true #
   visualize_samples: false 
