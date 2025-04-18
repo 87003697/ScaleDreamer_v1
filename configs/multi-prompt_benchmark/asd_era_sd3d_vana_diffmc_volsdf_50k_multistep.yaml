@@ -61,7 +61,7 @@ data:
     crop_size: 192 # same as wonder3D
 
 
-system_type: "multiimage-dual-renderer-multistep-generator-system"
+system_type: "multiimage-dual-renderer-multistep-generator-trd-system"
 system:
   initialize_shape: false # #true #
   visualize_samples: false 
@@ -75,6 +75,8 @@ system:
   num_steps_sampling: 4
   noise_scheduler: "ddpm" 
   sample_scheduler: "ddim" 
+
+  training_type: "rollout-rendering-distillation" # "progressive-rendering-distillation" or "rollout-rendering-distillation" or "rollout-rendering-distillation-last-step"
 
   scheduler_dir: ${system.geometry.space_generator_config.pretrained_model_name_or_path}
   specifiy_guidance_timestep: null # any of null, v1
@@ -179,7 +181,7 @@ system:
     era3d_color_weight: 1.
 
     # related to dmd weighting strategy
-    eps: 0.1
+    eps: 0.01
 
     # to save memory
     auto_grad: true
@@ -213,7 +215,7 @@ system:
     lambda_sparsity_2nd: 1.
     lambda_opaque_2nd: 0. 
     lambda_z_variance_2nd: 0.
-    lambda_eikonal_2nd: 100.
+    lambda_eikonal_2nd: 10.
     lambda_normal_consistency_2nd: 0.
     lambda_laplacian_smoothness_2nd: 0.
     lambda_normal_smoothness_2d_2nd: 0. 
